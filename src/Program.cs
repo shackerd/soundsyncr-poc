@@ -128,11 +128,7 @@ namespace Midicontrol
 
 
         public Task StartAsync()
-        {           
-            if(_input == null) {
-                throw new InvalidOperationException("Midi input was null");
-            }
-
+        {                       
             if(_cancellationSource.IsCancellationRequested && !_listening){
                 _cancellationSource = new CancellationTokenSource();
             }            
@@ -143,7 +139,10 @@ namespace Midicontrol
         }
 
         private async Task StartAsyncInternal(CancellationToken cancellationToken)
-        {                           
+        {                     
+            if(_input == null) {
+                throw new InvalidOperationException("Midi input was null");
+            }      
             // indicate to current object that we are listening 
             _listening = true;
 
@@ -151,21 +150,21 @@ namespace Midicontrol
             const int msgSize = 100;             
 
             // copy stack ref in local scope for safer execution (multi tasks)
-            PortMidi.MidiInput _in = _input;
+            PortMidi.MidiInput @in = _input;
 
             do
             {                              
                 byte[] buffer = new byte[msgSize];                        
 
                 // Better computed than _in.HasData
-                bool hasData = _in.Read(buffer, 0, msgSize) > 0;                                                                                
+                bool hasData = @in.Read(buffer, 0, msgSize) > 0;                                                                                
                 
                 byte nextLoopWait = _defaultOverheatDelay;
 
                 if(hasData){
 
                     // re read buffer as Event object 
-                    var msg = (MidiMessage)_in.ReadEvent(buffer, 0, msgSize);
+                    var msg = (MidiMessage)@in.ReadEvent(buffer, 0, msgSize);
 
                     // todo: inject logger 
                     Console.WriteLine(msg.ToString());
