@@ -51,7 +51,7 @@ namespace Midicontrol
 
                 MidiDeviceListener listener = new MidiDeviceListener(device);
                 listener.OnMidiMessage += async (msg) => {
-                    uint value = (uint)(msg.Value * (float)10);
+                    uint value = (uint)(msg.Value * (float)650);
                     await client.PlaybackStreams.First().Proxy.SetAsync("Volume", new uint[2] { value, value });
                     
                 };
