@@ -2,10 +2,15 @@
 
 Refs:
 
-## libsoundio
+## pulse audio (dbus)
 
-https://github.com/atsushieno/libsoundio-sharp
-https://github.com/andrewrk/libsoundio
+/etc/pulse/default.pa
+
+```
+.ifexists module-dbus-protocol.so
+load-module module-dbus-protocol
+.endif
+``` 
 
 ## portmidi
 

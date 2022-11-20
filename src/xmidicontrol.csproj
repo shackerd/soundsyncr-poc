@@ -11,5 +11,6 @@
     <PackageReference Include="libportmidi" Version="1.0.0" />
     <PackageReference Include="Spectre.Console" Version="0.45.0" />
     <PackageReference Include="Spectre.Console.CLI" Version="0.45.0" />
+    <PackageReference Include="Tmds.DBus" Version="0.11.0" />
   </ItemGroup>
 </Project>
