@@ -1,4 +1,4 @@
-namespace Midicontrol
+namespace Midicontrol.Midi
 {
     public class MidiMessage
     {

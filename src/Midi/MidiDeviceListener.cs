@@ -1,4 +1,4 @@
-namespace Midicontrol
+namespace Midicontrol.Midi
 {
     public class MidiDeviceListener : IDisposable
     {
@@ -107,7 +107,7 @@ namespace Midicontrol
                     OnMidiMessage?.Invoke(msg);
 
                     // better response time in case of data
-                    nextLoopWait = 2; 
+                    nextLoopWait = 0; 
                 }
 
                 // workaround to lighten CPU load 
