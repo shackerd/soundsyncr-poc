@@ -14,10 +14,12 @@ namespace Midicontrol.Midi
         public delegate void MidiMessageHandler(MidiMessage msg);
         public event MidiMessageHandler OnMidiMessage;
 
+        private SynchronizationContext _synCtx;
 
-        public MidiDeviceListener(PortMidi.MidiDeviceInfo device)
-        {
-            _device = device;            
+        public MidiDeviceListener(PortMidi.MidiDeviceInfo device, SynchronizationContext context)
+        {            
+            _device = device;        
+            _synCtx = context;   
         }
 
         private void Attach() {
@@ -71,10 +73,15 @@ namespace Midicontrol.Midi
 
             return Task.Factory
                 .StartNew(() => Attach())
-                .ContinueWith(_ => StartAsyncInternal(_cancellationSource.Token), TaskContinuationOptions.NotOnFaulted);            
+                .ContinueWith(
+                    _ => StartAsyncInternal(_cancellationSource.Token, _synCtx), 
+                    _cancellationSource.Token, 
+                    TaskContinuationOptions.NotOnFaulted,
+                    TaskScheduler.Current
+                );            
         }
 
-        private async Task StartAsyncInternal(CancellationToken cancellationToken)
+        private async Task StartAsyncInternal(CancellationToken cancellationToken, SynchronizationContext context)
         {                     
             if(_input == null) {
                 throw new InvalidOperationException("Midi input was null");
@@ -103,8 +110,15 @@ namespace Midicontrol.Midi
                     var msg = (MidiMessage)@in.ReadEvent(buffer, 0, msgSize);
 
                     // todo: inject logger / dispatcher
-                    Console.WriteLine(msg.ToString());
-                    OnMidiMessage?.Invoke(msg);
+
+                    context.Post(
+                        (_) => { 
+                            lock(_) { 
+                                OnMidiMessage?.Invoke(msg); 
+                            }
+                        }, 
+                        _stateLock
+                    );                        
 
                     // better response time in case of data
                     nextLoopWait = 0; 
@@ -121,7 +135,11 @@ namespace Midicontrol.Midi
         }     
 
         public Task StopAsync() {
-            return StopAsyncInternal().ContinueWith(_ => Detach());
+            return StopAsyncInternal()
+                .ContinueWith(
+                    _ => Detach(), 
+                    TaskScheduler.Current
+                );
         }
 
         private async Task StopAsyncInternal(){

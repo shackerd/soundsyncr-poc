@@ -6,7 +6,7 @@ using Tmds.DBus;
 namespace Midicontrol.PulseAudio.DBus
 {
     [DBusInterface("org.PulseAudio.Core1")]
-    interface ICoreProxy : IDBusObject
+    public interface ICoreProxy : IDBusObject
     {
         Task<ObjectPath> GetCardByNameAsync(string Name);
         Task<ObjectPath> GetSinkByNameAsync(string Name);

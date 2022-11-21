@@ -3,7 +3,7 @@ using Tmds.DBus;
 namespace Midicontrol.PulseAudio.DBus
 {
     [Dictionary]
-    class CoreProperties
+    public class CoreProperties
     {
         private uint _InterfaceRevision = default(uint);
         public uint InterfaceRevision

@@ -17,8 +17,8 @@ namespace Midicontrol
                     .WithAlias("dev");
             });
             // app.Run(args);
-            app.Run(new string[2]{"device", "--list"});
-        }
+            app.Run(new string[2]{"device", "--list"});            
+        }        
     }
 
     internal class DeviceCommand : AsyncCommand<DeviceCommandSettings>
@@ -30,17 +30,7 @@ namespace Midicontrol
         // xmidictrl -c -l
         // xmidictrl --channel --list
         public override async Task<int> ExecuteAsync(CommandContext context, DeviceCommandSettings settings)
-        {
-            PulseAudioClient client = new PulseAudioClient();
-            await client.ConnectAsync();
-
-            Dictionary<int, string> ctrl = 
-                new Dictionary<int, string>();
-
-            ctrl.Add(2, "chrome");
-            ctrl.Add(1, "teams");
-            
-            
+        {                        
             if(settings.List){
                 Table table = new Table();
                 table.AddColumns("Id", "Interface", "Name", "Input", "Output", "Opened");
@@ -62,15 +52,26 @@ namespace Midicontrol
             }
             // if(settings.SetDefault){
             if(true) {
-                var device = PortMidi.MidiDeviceManager.AllDevices.Last();
 
-                MidiDeviceListener listener = new MidiDeviceListener(device);
+                SynchronizationContext synCtx = new SynchronizationContext();
+
+                PulseAudioClient client = new PulseAudioClient(synCtx);
+                    await client.ConnectAsync().ConfigureAwait(false);
+
+                Dictionary<int, string> ctrl = 
+                    new Dictionary<int, string>();
+
+                ctrl.Add(2, "chrome");
+                ctrl.Add(1, "teams");
+                ctrl.Add(3, "firefox");
+
+                var device = PortMidi.MidiDeviceManager.AllDevices.Last();                
+
+                MidiDeviceListener listener = new MidiDeviceListener(device, synCtx);
 
                 listener.OnMidiMessage += async (msg) => {
                     
                     uint value = PuseAudioMidiValueConverter.FromCCValueToVolume((uint)msg.Value);
-
-                    Console.WriteLine($"0x{value.ToString("X2")}");
 
                     if(!client.PlaybackStreams.Any())
                     {
@@ -88,26 +89,19 @@ namespace Midicontrol
                         
                         if (stream != null)
                         {
+                            uint percentage = (uint)((double)((double)value / (double)0xFFFF) * 100);
+                            Console.WriteLine($"{stream.Binary} volume {percentage}%");
+                            
                             await stream
                                 .Proxy
-                                .SetAsync("Volume", new uint[2] { value, value });    
+                                .SetAsync("Volume", new uint[2] { value, value }).ConfigureAwait(false);    
                         }
                         
                     }                    
                 };
                 
-                Console.WriteLine($"Listening to device: [underline green]{device.Name}[/]");
-                Task listenerTask = listener.StartAsync();
-
-                if((listenerTask.Status & TaskStatus.Faulted) == TaskStatus.Faulted)
-                {
-                    AnsiConsole.WriteException(listenerTask.Exception);
-                }
-                else {                    
-                    Task.Run(() => AnsiConsole.Markup($"Listening to device: [underline green]{device.Name}[/]"));
-                }
-                
-            
+                Console.WriteLine($"Listening to device: {device.Name}");
+                var listenerTask = listener.StartAsync().ConfigureAwait(false);                
                 Console.ReadLine();
             }
             // Omitted
