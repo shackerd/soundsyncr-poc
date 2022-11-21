@@ -23,10 +23,24 @@ namespace Midicontrol.PulseAudio
 
         public static async Task<PulseAudioStream> CreateAsync(IStreamProxy proxy, PulseAudioStreamType type)
         {            
-            var props = await proxy.GetAllAsync();
-            var app = System.Text.Encoding.Default.GetString(props.PropertyList[_applicationProcessBinary]);
-            var pid = System.Text.Encoding.Default.GetString(props.PropertyList[_applicationProcessId]);
+            StreamProperties props = await proxy.GetAllAsync();
+            var app = System.Text.Encoding.Default.GetString(GetPropertyValue(props, _applicationProcessBinary));
+            var pid = System.Text.Encoding.Default.GetString(GetPropertyValue(props, _applicationProcessId));            
             return new PulseAudioStream(proxy, props, app, pid, type);
+        }
+
+        private static byte[] GetPropertyValue(StreamProperties properties, string propName) 
+        {
+            byte[] rawValue = properties.PropertyList[propName];
+
+            byte[] value = new byte[rawValue.Length - 1];
+
+            for (int i = 0; i < rawValue.Length - 1; i++)
+            {
+                value[i] = rawValue[i];
+            }
+
+            return value;
         }
     }
 }
