@@ -4,25 +4,53 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using Midicontrol.Midi;
 using Midicontrol.PulseAudio;
+using Microsoft.Extensions.DependencyInjection;
+using Midicontrol.Infrastructure;
 
 namespace Midicontrol
 {
     public class Program {
         public static void Main(string[] args)
         {                        
-            var app = new CommandApp();
+            ITypeRegistrar registrar = Setup();
+
+            CommandApp app = new CommandApp(registrar);                    
+
             app.Configure(config => {
-                config
+                config                
                     .AddCommand<DeviceCommand>("device")
                     .WithAlias("dev");
-            });
+            });            
+            
             // app.Run(args);
             app.Run(new string[2]{"device", "--list"});            
         }        
-    }
+
+        private static ITypeRegistrar Setup(){
+
+            IServiceCollection services = new ServiceCollection();
+            
+            services.AddSingleton<SynchronizationContext>();
+            services.AddSingleton<PulseAudioClient>();            
+            services.AddTransient<IMidiMessageSink, PulseAudioMidiSink>();
+            
+
+            return new TypeRegistrar(services);
+        }
+    }    
 
     internal class DeviceCommand : AsyncCommand<DeviceCommandSettings>
     {
+        private readonly SynchronizationContext _synchronizationContext;
+        private readonly IEnumerable<IMidiMessageSink> _sinks;
+        private readonly PulseAudioClient _client;
+
+        public DeviceCommand(SynchronizationContext synchronizationContext, IEnumerable<IMidiMessageSink> sinks, PulseAudioClient client)
+        {
+            _synchronizationContext = synchronizationContext;
+            _sinks = sinks;
+            _client = client;
+        }
         // xmidictrl -v
         // xmidictrl -d -l
         // xmidictrl --device --list
@@ -53,52 +81,11 @@ namespace Midicontrol
             // if(settings.SetDefault){
             if(true) {
 
-                SynchronizationContext synCtx = new SynchronizationContext();
-
-                PulseAudioClient client = new PulseAudioClient(synCtx);
-                    await client.ConnectAsync().ConfigureAwait(false);
-
-                Dictionary<int, string> ctrl = 
-                    new Dictionary<int, string>();
-
-                ctrl.Add(2, "chrome");
-                ctrl.Add(1, "teams");
-                ctrl.Add(3, "firefox");
-
+                await _client.ConnectAsync();
+                
                 var device = PortMidi.MidiDeviceManager.AllDevices.Last();                
 
-                MidiDeviceListener listener = new MidiDeviceListener(device, synCtx);
-
-                listener.OnMidiMessage += async (msg) => {
-                    
-                    uint value = PuseAudioMidiValueConverter.FromCCValueToVolume((uint)msg.Value);
-
-                    if(!client.PlaybackStreams.Any())
-                    {
-                        return;
-                    }
-
-                    if (ctrl.ContainsKey((int)msg.Controller))
-                    {
-                        string binary = ctrl[(int)msg.Controller];
-
-                        var stream = 
-                            client
-                                .PlaybackStreams
-                                .FirstOrDefault(_ => _.Binary.StartsWith(binary));
-                        
-                        if (stream != null)
-                        {
-                            uint percentage = (uint)((double)((double)value / (double)0xFFFF) * 100);
-                            Console.WriteLine($"{stream.Binary} volume {percentage}%");
-
-                            await stream
-                                .Proxy
-                                .SetAsync("Volume", new uint[1] { value }).ConfigureAwait(false);                                                                                
-                        }
-                        
-                    }                    
-                };
+                MidiDeviceListener listener = new MidiDeviceListener(device, _synchronizationContext, _sinks);                
                 
                 Console.WriteLine($"Listening to device: {device.Name}");
                 var listenerTask = listener.StartAsync().ConfigureAwait(false);                
@@ -109,23 +96,7 @@ namespace Midicontrol
         }        
     }    
 
-    public static class PuseAudioMidiValueConverter
-    {
-        public static uint FromCCValueToVolume(uint value)
-        {
-            // MIDI MSB (Most Significant Byte) cc (ControlChange) max value is encoded on 7-bit -> byte.MaxValue >> 1 (0x7F) 
-
-            if(value > 0x7F){
-                throw new ArgumentOutOfRangeException("Value exceed 0x7F (127)");
-            }
-
-            uint paValue = (uint)(value * 0x205); // 0x204 * 0x7F  will not reach 0xFFFF
-            
-            paValue = Math.Clamp(paValue, 0x0, 0xFFFF); // 0xFFFF is volume max value, beyond it is amplified
-
-            return paValue;
-        }
-    }
+    
 
     internal class DeviceCommandSettings : CommandSettings
     {
@@ -135,11 +106,6 @@ namespace Midicontrol
 
         [CommandOption("-s|--set-default <ID>")]
         public bool SetDefault { get; set; }
-    }
-
-    internal class SetDefaultDeviceCommandSettings: CommandSettings 
-    {
-
-    }   
+    }       
 }
 

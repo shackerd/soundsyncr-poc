@@ -9,6 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="libportmidi" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
     <PackageReference Include="Spectre.Console" Version="0.45.0" />
     <PackageReference Include="Spectre.Console.CLI" Version="0.45.0" />
     <PackageReference Include="Tmds.DBus" Version="0.11.0" />

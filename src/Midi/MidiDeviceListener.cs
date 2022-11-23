@@ -11,15 +11,15 @@ namespace Midicontrol.Midi
         private bool _isDisposing;
         private object _stateLock = new object();
 
-        public delegate void MidiMessageHandler(MidiMessage msg);
-        public event MidiMessageHandler OnMidiMessage;
-
         private SynchronizationContext _synCtx;
 
-        public MidiDeviceListener(PortMidi.MidiDeviceInfo device, SynchronizationContext context)
+        private readonly IEnumerable<IMidiMessageSink> _sinks;
+
+        public MidiDeviceListener(PortMidi.MidiDeviceInfo device, SynchronizationContext context, IEnumerable<IMidiMessageSink> sinks)
         {            
             _device = device;        
             _synCtx = context;   
+            _sinks = sinks;
         }
 
         private void Attach() {
@@ -112,10 +112,13 @@ namespace Midicontrol.Midi
                     // todo: inject logger / dispatcher
 
                     context.Post(
-                        (_) => { 
-                            lock(_) { 
-                                OnMidiMessage?.Invoke(msg); 
-                            }
+                        async (_) => {                             
+                            foreach (IMidiMessageSink sink in _sinks)
+                            {
+                                await sink
+                                    .ProcessMessageAsync(msg)
+                                    .ConfigureAwait(false);
+                            }                           
                         }, 
                         _stateLock
                     );                        
