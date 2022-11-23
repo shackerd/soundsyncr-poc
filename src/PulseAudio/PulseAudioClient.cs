@@ -1,6 +1,7 @@
 using Tmds.DBus;
 using Midicontrol.PulseAudio.DBus;
 using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace Midicontrol.PulseAudio
 {  
@@ -11,14 +12,18 @@ namespace Midicontrol.PulseAudio
         private Connection _connection;
 
         private readonly SynchronizationContext _synCtx;
+        private readonly ILogger _logger;
+        private readonly ILogger<IPulseAudioStreamStore> _storeLogger;
 
         private IPulseAudioStreamStore _streamStore;
 
         public IPulseAudioStreamStore StreamStore => _streamStore;
 
-        public PulseAudioClient(SynchronizationContext synCtx)
+        public PulseAudioClient(SynchronizationContext synCtx, ILogger<PulseAudioClient> logger, ILogger<IPulseAudioStreamStore> storeLogger)
         {
             _synCtx = synCtx;
+            _logger = logger;
+            _storeLogger = storeLogger;
         }
 
         private async Task<string> ServerLookupAsync(){
@@ -54,7 +59,7 @@ namespace Midicontrol.PulseAudio
 
             ConnectionInfo inf = await _connection.ConnectAsync().ConfigureAwait(false);
 
-            _streamStore = new PulseAudioStreamStore(_connection);
+            _streamStore = new PulseAudioStreamStore(_connection, _storeLogger);
 
             await _streamStore.InitializeAsync().ConfigureAwait(false);
         }        
@@ -67,7 +72,7 @@ namespace Midicontrol.PulseAudio
                 case ConnectionState.Disconnected:
                     throw new Exception("Connection close");                    
                 default:
-                    Console.WriteLine($"PulseAudio-Connection: {eventArgs.State}");
+                    _logger.LogInformation($"PulseAudio-Connection: {eventArgs.State}");
                     break;
             }
         }        

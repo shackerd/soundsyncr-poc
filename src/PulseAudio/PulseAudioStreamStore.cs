@@ -1,5 +1,6 @@
 using Tmds.DBus;
 using Midicontrol.PulseAudio.DBus;
+using Microsoft.Extensions.Logging;
 
 namespace Midicontrol.PulseAudio
 {
@@ -20,14 +21,14 @@ namespace Midicontrol.PulseAudio
 
         private readonly Connection _connection;
         private readonly ICoreProxy _proxy;
+        private readonly ILogger _logger;
         private readonly List<PulseAudioStream> _streams = new List<PulseAudioStream>();
         private readonly PulseAudioStreamWatchdog _watchdog;
         public IEnumerable<PulseAudioStream> RecordStreams => _streams.Where(s => s.Type == PulseAudioStreamType.RecordStream);
         public IEnumerable<PulseAudioStream> PlaybackStreams => _streams.Where(s => s.Type == PulseAudioStreamType.PlaybackStream);
         public IEnumerable<PulseAudioStream> AllStreams => _streams.AsEnumerable();
 
-
-        public PulseAudioStreamStore(Connection connection)
+        public PulseAudioStreamStore(Connection connection, ILogger<IPulseAudioStreamStore> logger)
         {
             if (connection == null)
             {
@@ -35,6 +36,7 @@ namespace Midicontrol.PulseAudio
             }
 
             _connection = connection;
+            _logger = logger;
             _proxy = _connection.CreateProxy<ICoreProxy>(_coreSeviceName, _core1ObjectPath);
             _watchdog = new PulseAudioStreamWatchdog(_proxy);
         }
@@ -92,7 +94,7 @@ namespace Midicontrol.PulseAudio
             PulseAudioStream stream =
                 await GetStreamObjectAsync(_connection, path, type).ConfigureAwait(false);
 
-            Console.WriteLine($"Created stream: {stream.Binary}:{stream.Pid}");
+            _logger.LogInformation($"Created {stream.Type.ToString().ToLower()}: {stream.Binary} [{stream.Pid}]");
 
             _streams.Add(stream);
         }
@@ -107,7 +109,7 @@ namespace Midicontrol.PulseAudio
                 return;
             }
 
-            Console.WriteLine($"Removed stream: {stream.Binary}:{stream.Pid}");
+            _logger.LogInformation($"Removed {stream.Type.ToString().ToLower()}: {stream.Binary} [{stream.Pid}]");
 
             _streams.Remove(stream);
         }

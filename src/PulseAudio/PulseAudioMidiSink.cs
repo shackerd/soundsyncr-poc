@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Midicontrol.Midi;
 
 namespace Midicontrol.PulseAudio
@@ -6,10 +7,12 @@ namespace Midicontrol.PulseAudio
     {
         private readonly PulseAudioClient _client;
         private readonly Dictionary<int, string> _ctrl;
+        private readonly ILogger _logger;
 
-        public PulseAudioMidiSink(PulseAudioClient client)
+        public PulseAudioMidiSink(PulseAudioClient client, ILogger<PulseAudioMidiSink> logger)
         {
             _client = client;
+            _logger = logger;
 
             _ctrl = new Dictionary<int, string>();
             _ctrl.Add(2, "chrome");
@@ -47,7 +50,7 @@ namespace Midicontrol.PulseAudio
                         .SetVolumeAsync(value);
 
                     uint percentage = (uint)((double)((double)value / (double)0xFFFF) * 100);
-                    Console.WriteLine($"{stream.Binary} volume {percentage}%");                            
+                    _logger.LogDebug($"{stream.Binary} volume {percentage}%");                            
                 }
                 
             }    
