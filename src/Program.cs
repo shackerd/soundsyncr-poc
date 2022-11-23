@@ -91,10 +91,10 @@ namespace Midicontrol
                         {
                             uint percentage = (uint)((double)((double)value / (double)0xFFFF) * 100);
                             Console.WriteLine($"{stream.Binary} volume {percentage}%");
-                            
+
                             await stream
                                 .Proxy
-                                .SetAsync("Volume", new uint[2] { value, value }).ConfigureAwait(false);    
+                                .SetAsync("Volume", new uint[1] { value }).ConfigureAwait(false);                                                                                
                         }
                         
                     }                    
