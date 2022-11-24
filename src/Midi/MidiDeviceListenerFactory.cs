@@ -14,21 +14,24 @@ namespace Midicontrol.Midi
     {
         private readonly SynchronizationContext _synchronizationContext;
         private readonly IEnumerable<IMidiMessageSink> _sinks;
-        private readonly ILogger<IMidiDeviceListener> _logger;
+        private readonly ILogger<IMidiDeviceListener> _listenerLogger;
+        private readonly ILogger<IMidiMessageDispatcher> _dispatcherLogger;
         private readonly IMidiListenerStore _store;
         private readonly MidiBindingMap _bindingMap;
 
         public MidiDeviceListenerFactory(
             SynchronizationContext synchronizationContext,
             IEnumerable<IMidiMessageSink> sinks,
-            ILogger<IMidiDeviceListener> logger,
+            ILogger<IMidiDeviceListener> listenerLogger,
+            ILogger<IMidiMessageDispatcher> dispatcherLogger,
             IMidiListenerStore store,
             MidiBindingMap bindingMap
         )
         {
             _synchronizationContext = synchronizationContext;
             _sinks = sinks;
-            _logger = logger;
+            _listenerLogger = listenerLogger;
+            _dispatcherLogger = dispatcherLogger;
             _store = store;
             _bindingMap = bindingMap;
         }
@@ -38,7 +41,11 @@ namespace Midicontrol.Midi
 
             var map = _bindingMap.DeviceMaps.FirstOrDefault(d => d.DeviceName.Equals(device.Name));
             var sinks = _sinks.Where(s => map.Sinks.Any(m => m.Sink.Equals(s.Name)));
-            IMidiDeviceListener listener = new MidiDeviceListener(device, _synchronizationContext, sinks, _logger, map.Sinks);
+
+            IMidiMessageDispatcher dispatcher =
+                new MidiMessageDispatcher(_dispatcherLogger, sinks, map.Sinks, _synchronizationContext);
+
+            IMidiDeviceListener listener = new MidiDeviceListener(device, _listenerLogger, dispatcher);
             
             if(!_store.TryAdd(listener)){
                 throw new Exception("Cannot register listener");

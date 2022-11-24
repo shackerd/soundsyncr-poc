@@ -6,7 +6,6 @@ namespace Midicontrol.Midi
     public class DebugMidiMessageSink : IMidiMessageSink
     {
         private readonly ILogger<DebugMidiMessageSink> _logger;
-        private IEnumerable<MidiBinding> _bindings;
 
         public DebugMidiMessageSink(ILogger<DebugMidiMessageSink> logger)
         {
@@ -15,17 +14,18 @@ namespace Midicontrol.Midi
 
         public string Name => "Debug Sink";
 
-        public Task InitializeAsync(IEnumerable<MidiBinding> bindings)
+        public Task InitializeAsync()
         {
-            _bindings = bindings;
-
             return Task.CompletedTask;
         }
 
-        public Task ProcessMessageAsync(MidiMessage message)
+        public Task ProcessMessageAsync(IEnumerable<IMidiMessageSinkArgs> args)
         {
-            _logger.LogDebug(message.ToString());
+            foreach (var arg in args)
+            {
+                _logger.LogDebug($"{arg.Action}->{arg.Destination}:{arg.Value}");
+            }
             return Task.CompletedTask;
         }
-    }
+    }    
 }

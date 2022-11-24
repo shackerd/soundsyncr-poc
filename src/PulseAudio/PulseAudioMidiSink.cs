@@ -8,8 +8,8 @@ namespace Midicontrol.PulseAudio
     {
         private readonly PulseAudioClient _client;
         private readonly ILogger _logger;
-
-        private IEnumerable<MidiBinding> _bindings;
+        private const string _playbackStreamVolumeAction = "PlaybackStream.Volume";
+        private const string _recordStreamVolumeAction = "RecordStream.Volume";
 
         public string Name => "Pulse Audio";
 
@@ -26,52 +26,48 @@ namespace Midicontrol.PulseAudio
 
         private async Task ProcessMessageAsyncInternal(MidiMessage message)
         {
-            uint value = PulseAudioMidiValueConverter.FromCCValueToVolume((uint)message.Value);
-
-            if(!_client.StreamStore.PlaybackStreams.Any())
-            {
-                return;
-            }
-
-            IEnumerable<PulseAudioStream> streams = 
-                GetStreams((int)message.Controller);
-                
-            if (streams != null)
-            {
-                foreach (PulseAudioStream stream in streams)
-                {
-                    await stream
-                        .SetVolumeAsync(value);
-
-                    uint percentage = (uint)((double)((double)value / (double)0xFFFF) * 100);
-                    _logger.LogDebug($"Pulse Audio : {stream.Binary} volume {percentage}%");                               
-                }                    
-            }  
+            
         }
 
-        private IEnumerable<PulseAudioStream> GetStreams(int controller)
+        private IEnumerable<PulseAudioStream> GetStreams(string destination)
         {
-            var binding = 
-                _bindings
-                    .FirstOrDefault(b => b.Controller == controller);
-
-            if(binding == null){
-                return Enumerable.Empty<PulseAudioStream>();
-            }
-                
-            return _client
-                .StreamStore
-                .PlaybackStreams
-                .Where(s => binding.Params.Any(p => p.Destination.Equals(s.Binary, StringComparison.InvariantCultureIgnoreCase)));
+            
+            return _client.StreamStore.PlaybackStreams.Where(s => s.Binary.Equals(destination, StringComparison.InvariantCultureIgnoreCase));            
         }
 
-        public async Task InitializeAsync(IEnumerable<MidiBinding> bindings)
+        public async Task InitializeAsync()
         {
-            _bindings = bindings;
-
             if (!_client.Initialized)
             {
                 await _client.ConnectAsync();
+            }            
+        }
+
+        public async Task ProcessMessageAsync(IEnumerable<IMidiMessageSinkArgs> args)
+        {
+            foreach (var arg in args)
+            {
+                uint value = PulseAudioMidiValueConverter.FromCCValueToVolume((uint)arg.Value);
+
+                if(!_client.StreamStore.PlaybackStreams.Any())
+                {
+                    return;
+                }
+
+                IEnumerable<PulseAudioStream> streams = 
+                    GetStreams(arg.Destination);
+                    
+                if (streams != null)
+                {
+                    foreach (PulseAudioStream stream in streams)
+                    {
+                        await stream
+                            .SetVolumeAsync(value);
+
+                        uint percentage = (uint)((double)((double)value / (double)0xFFFF) * 100);
+                        _logger.LogDebug($"Pulse Audio : {stream.Binary} volume {percentage}%");                               
+                    }                    
+                }  
             }            
         }
     }

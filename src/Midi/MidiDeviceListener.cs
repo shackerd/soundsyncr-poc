@@ -5,11 +5,11 @@ using Midicontrol.Infrastructure.Bindings;
 namespace Midicontrol.Midi
 {
     public interface IMidiDeviceListener
-    {
-        IEnumerable<IMidiMessageSink> Sinks { get; }        
+    {    
         void Dispose();
         Task StartAsync();
         Task StopAsync();
+        IMidiMessageDispatcher Dispatcher { get; }
         string DeviceName { get; }
     }
 
@@ -26,21 +26,24 @@ namespace Midicontrol.Midi
 
         private SynchronizationContext _synCtx;
 
-        private readonly IEnumerable<IMidiMessageSink> _sinks;
-        private readonly IEnumerable<MidiSinkMap> _sinkMaps;
-        private readonly ILogger _logger;
+        private readonly IEnumerable<IMidiMessageSink> _sinks;        
+        private readonly ILogger<IMidiDeviceListener> _logger;
 
-        public IEnumerable<IMidiMessageSink> Sinks => _sinks;
+        private readonly IMidiMessageDispatcher _dispatcher;
+
+        public IMidiMessageDispatcher Dispatcher => _dispatcher;
 
         public string DeviceName => _device.Name;
 
-        public MidiDeviceListener(PortMidi.MidiDeviceInfo device, SynchronizationContext context, IEnumerable<IMidiMessageSink> sinks, ILogger<IMidiDeviceListener> logger, IEnumerable<MidiSinkMap> sinkMaps)
+        public MidiDeviceListener(
+            PortMidi.MidiDeviceInfo device, 
+            ILogger<IMidiDeviceListener> logger, 
+            IMidiMessageDispatcher dispatcher
+        )
         {
             _device = device;
-            _synCtx = context;
-            _sinks = sinks;
             _logger = logger;
-            _sinkMaps = sinkMaps;
+            _dispatcher = dispatcher;
         }
 
         private void Attach()
@@ -119,12 +122,7 @@ namespace Midicontrol.Midi
                 throw new InvalidOperationException("Midi input was null");
             }
 
-            foreach (IMidiMessageSink sink in _sinks)
-            {
-                MidiSinkMap sinkMap = _sinkMaps.FirstOrDefault(s => s.Sink == sink.Name);
-                
-                await sink.InitializeAsync(sinkMap?.Bindings);
-            }
+            await _dispatcher.InitializeAsync().ConfigureAwait(false);
 
             // indicate to current object that we are listening 
             _listening = true;
@@ -146,24 +144,10 @@ namespace Midicontrol.Midi
 
                 if (hasData)
                 {
-
                     // re read buffer as Event object 
                     var msg = (MidiMessage)@in.ReadEvent(buffer, 0, msgSize);
 
-                    // todo: inject logger / dispatcher
-
-                    context.Post(
-                        async (_) =>
-                        {
-                            foreach (IMidiMessageSink sink in _sinks)
-                            {
-                                await sink
-                                    .ProcessMessageAsync(msg)
-                                    .ConfigureAwait(false);
-                            }
-                        },
-                        _stateLock
-                    );
+                    await _dispatcher.BroadcastAsync(msg).ConfigureAwait(false);                    
 
                     // better response time in case of data
                     nextLoopWait = 0;
@@ -215,5 +199,5 @@ namespace Midicontrol.Midi
                 }
             }
         }
-    }
+    }    
 }

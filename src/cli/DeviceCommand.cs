@@ -53,7 +53,7 @@ namespace Midicontrol.CLI
                 var listenerTask = listener.StartAsync().ConfigureAwait(false);                
 
                 // xmidicontrol list sinks
-                var sinks = _store.GetListener(device.Name).Sinks.Select(s => s.Name);
+                var sinks = _store.GetListener(device.Name).Dispatcher.Sinks.Select(s => s.Name);
 
                 var root = new Tree($"Sinks for {device.Name}");
 

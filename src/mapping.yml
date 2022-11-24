@@ -5,19 +5,19 @@ devicesMap:
         bindings: 
           - controller: 1
             params:
-              - action: "volume"
+              - action: "PlaybackStream.Volume"
                 destination: "teams"
           - controller: 2
             params:
-              - action: "volume"
+              - action: "PlaybackStream.Volume"
                 destination: "chrome"
       - name: "Test"
         bindings: 
           - controller: 1
             params:
-              - action: "volume"
+              - action: "PlaybackStream.Volume"
                 destination: "chrome"      
           - controller: 2
             params:
-              - action: "volume"
+              - action: "PlaybackStream.Volume"
                 destination: "teams"
