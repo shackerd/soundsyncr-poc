@@ -94,7 +94,7 @@ namespace Midicontrol.PulseAudio
             PulseAudioStream stream =
                 await GetStreamObjectAsync(_connection, path, type).ConfigureAwait(false);
 
-            _logger.LogInformation($"Created {stream.Type.ToString().ToLower()}: {stream.Binary} [{stream.Pid}]");
+            _logger.LogInformation($"Pulse Audio : Created {stream.Type.ToString().ToLower()}: {stream.Binary} [{stream.Pid}]");
 
             _streams.Add(stream);
         }
@@ -109,7 +109,7 @@ namespace Midicontrol.PulseAudio
                 return;
             }
 
-            _logger.LogInformation($"Removed {stream.Type.ToString().ToLower()}: {stream.Binary} [{stream.Pid}]");
+            _logger.LogInformation($"Pulse Audio : Removed {stream.Type.ToString().ToLower()}: {stream.Binary} [{stream.Pid}]");
 
             _streams.Remove(stream);
         }

@@ -1,13 +1,16 @@
 
 using Microsoft.Extensions.Logging;
+using Midicontrol.Infrastructure.Bindings;
 
 namespace Midicontrol.Midi
 {
     public interface IMidiDeviceListener
     {
+        IEnumerable<IMidiMessageSink> Sinks { get; }        
         void Dispose();
         Task StartAsync();
         Task StopAsync();
+        string DeviceName { get; }
     }
 
     internal class MidiDeviceListener : IDisposable, IMidiDeviceListener
@@ -24,14 +27,20 @@ namespace Midicontrol.Midi
         private SynchronizationContext _synCtx;
 
         private readonly IEnumerable<IMidiMessageSink> _sinks;
+        private readonly IEnumerable<MidiSinkMap> _sinkMaps;
         private readonly ILogger _logger;
 
-        public MidiDeviceListener(PortMidi.MidiDeviceInfo device, SynchronizationContext context, IEnumerable<IMidiMessageSink> sinks, ILogger<IMidiDeviceListener> logger)
+        public IEnumerable<IMidiMessageSink> Sinks => _sinks;
+
+        public string DeviceName => _device.Name;
+
+        public MidiDeviceListener(PortMidi.MidiDeviceInfo device, SynchronizationContext context, IEnumerable<IMidiMessageSink> sinks, ILogger<IMidiDeviceListener> logger, IEnumerable<MidiSinkMap> sinkMaps)
         {
             _device = device;
             _synCtx = context;
             _sinks = sinks;
             _logger = logger;
+            _sinkMaps = sinkMaps;
         }
 
         private void Attach()
@@ -109,6 +118,14 @@ namespace Midicontrol.Midi
             {
                 throw new InvalidOperationException("Midi input was null");
             }
+
+            foreach (IMidiMessageSink sink in _sinks)
+            {
+                MidiSinkMap sinkMap = _sinkMaps.FirstOrDefault(s => s.Sink == sink.Name);
+                
+                await sink.InitializeAsync(sinkMap?.Bindings);
+            }
+
             // indicate to current object that we are listening 
             _listening = true;
 

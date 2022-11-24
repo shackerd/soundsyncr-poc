@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using Midicontrol.Midi;
 using Midicontrol.PulseAudio;
 using Spectre.Console;
@@ -7,21 +8,20 @@ namespace Midicontrol.CLI
 {
     internal class DeviceCommand : AsyncCommand<DeviceCommandSettings>
     {        
-        private readonly PulseAudioClient _client;
         private readonly IMidiDeviceListenerFactory _listenerFactory;
+        private readonly ILogger<DeviceCommand> _logger;
+        private readonly IMidiListenerStore _store;
 
-        public DeviceCommand(PulseAudioClient client, IMidiDeviceListenerFactory listenerFactory)
-        {
-            
-            _client = client;
+        public DeviceCommand(IMidiDeviceListenerFactory listenerFactory, ILogger<DeviceCommand> logger, IMidiListenerStore store)
+        {            
             _listenerFactory = listenerFactory;
+            _logger = logger;
+            _store = store;
         }
-        // xmidictrl -v
-        // xmidictrl -d -l
-        // xmidictrl --device --list
-        // xmidictrl --device --list
-        // xmidictrl -c -l
-        // xmidictrl --channel --list
+        
+        // xmidicontrol start        
+        // xmidicontrol list sinks
+        // xmidicontrol list listener --map
         public override async Task<int> ExecuteAsync(CommandContext context, DeviceCommandSettings settings)
         {                        
             if(settings.List){
@@ -46,13 +46,25 @@ namespace Midicontrol.CLI
             // if(settings.SetDefault){
             if(true) {
 
-                await _client.ConnectAsync();
-
                 var device = PortMidi.MidiDeviceManager.AllDevices.Last();                
 
                 IMidiDeviceListener listener = _listenerFactory.Create(device);
                                 
                 var listenerTask = listener.StartAsync().ConfigureAwait(false);                
+
+                // xmidicontrol list sinks
+                var sinks = _store.GetListener(device.Name).Sinks.Select(s => s.Name);
+
+                var root = new Tree($"Sinks for {device.Name}");
+
+
+                foreach (var sink in sinks)
+                {
+                    root.AddNode(sink);                                        
+                }
+
+                AnsiConsole.Write(root);
+
                 Console.ReadLine();
             }
             // Omitted

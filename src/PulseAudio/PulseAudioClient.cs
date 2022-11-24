@@ -16,6 +16,9 @@ namespace Midicontrol.PulseAudio
         private readonly ILogger<IPulseAudioStreamStore> _storeLogger;
 
         private IPulseAudioStreamStore _streamStore;
+        private bool _initialized;
+
+        public bool Initialized => _initialized;
 
         public IPulseAudioStreamStore StreamStore => _streamStore;
 
@@ -62,6 +65,8 @@ namespace Midicontrol.PulseAudio
             _streamStore = new PulseAudioStreamStore(_connection, _storeLogger);
 
             await _streamStore.InitializeAsync().ConfigureAwait(false);
+
+            _initialized = true;
         }        
 
         private void OnConnectionEvent(object _, ConnectionStateChangedEventArgs eventArgs) 
@@ -72,7 +77,7 @@ namespace Midicontrol.PulseAudio
                 case ConnectionState.Disconnected:
                     throw new Exception("Connection close");                    
                 default:
-                    _logger.LogInformation($"PulseAudio-Connection: {eventArgs.State}");
+                    _logger.LogInformation($"Pulse Audio : {eventArgs.State}");
                     break;
             }
         }        

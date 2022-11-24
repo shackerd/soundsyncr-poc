@@ -1,0 +1,23 @@
+devicesMap: 
+  - deviceName: "nanoKONTROL2 nanoKONTROL2 _ CTR"
+    sinks:    
+      - name: "PulseAudio"
+        bindings: 
+          - controller: 1
+            params:
+              - action: "volume"
+                destination: "teams"
+          - controller: 2
+            params:
+              - action: "volume"
+                destination: "chrome"
+      - name: "Test"
+        bindings: 
+          - controller: 1
+            params:
+              - action: "volume"
+                destination: "chrome"      
+          - controller: 2
+            params:
+              - action: "volume"
+                destination: "teams"
