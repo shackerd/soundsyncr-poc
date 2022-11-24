@@ -19,16 +19,6 @@ namespace Midicontrol.PulseAudio
             _logger = logger;
         }
 
-        public Task ProcessMessageAsync(MidiMessage message){
-
-            return ProcessMessageAsyncInternal(message);
-        }
-
-        private async Task ProcessMessageAsyncInternal(MidiMessage message)
-        {
-            
-        }
-
         private IEnumerable<PulseAudioStream> GetStreams(string destination)
         {
             
