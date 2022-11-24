@@ -19,10 +19,10 @@ namespace Midicontrol.PulseAudio
             _logger = logger;
         }
 
-        private IEnumerable<PulseAudioStream> GetStreams(string destination)
+        private IEnumerable<PulseAudioStream> GetStreams(string destination, IEnumerable<PulseAudioStream> source)
         {
             
-            return _client.StreamStore.PlaybackStreams.Where(s => s.Binary.Equals(destination, StringComparison.InvariantCultureIgnoreCase));            
+            return source.Where(s => s.Binary.Equals(destination, StringComparison.InvariantCultureIgnoreCase));            
         }
 
         public async Task InitializeAsync()
@@ -45,7 +45,17 @@ namespace Midicontrol.PulseAudio
                 }
 
                 IEnumerable<PulseAudioStream> streams = 
-                    GetStreams(arg.Destination);
+                    Enumerable.Empty<PulseAudioStream>();
+
+                switch (arg.Action)
+                {
+                    case _playbackStreamVolumeAction:
+                        streams = GetStreams(arg.Destination, _client.StreamStore.PlaybackStreams);
+                        break;
+                    case _recordStreamVolumeAction:
+                        streams = GetStreams(arg.Destination, _client.StreamStore.RecordStreams);
+                        break;
+                }
                     
                 if (streams != null)
                 {

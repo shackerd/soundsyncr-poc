@@ -71,7 +71,7 @@ namespace Midicontrol
                                     Controller = 1,
                                     Params = new List<MidiSinkParam>() {
                                         new MidiSinkParam() {
-                                            Action = "volume",
+                                            Action = "PlaybackStream.Volume",
                                             Destination = "teams"
                                         }
                                     }
@@ -80,7 +80,7 @@ namespace Midicontrol
                                     Controller = 2,
                                     Params = new List<MidiSinkParam>() {
                                         new MidiSinkParam() {
-                                            Action = "volume",
+                                            Action = "PlaybackStream.Volume",
                                             Destination = "chrome"
                                         }
                                     }
