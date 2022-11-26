@@ -7,6 +7,7 @@ namespace Midicontrol.Midi
     public interface IMidiDeviceListenerFactory
     {
         IMidiDeviceListener Create(MidiDeviceInfo device);
+        IMidiDeviceListener CreateDebug(PortMidi.MidiDeviceInfo device);
     }
 
     // missing map device -> sinks
@@ -44,6 +45,20 @@ namespace Midicontrol.Midi
 
             IMidiMessageDispatcher dispatcher =
                 new MidiMessageDispatcher(_dispatcherLogger, sinks, map.Sinks, _synchronizationContext);
+
+            IMidiDeviceListener listener = new MidiDeviceListener(device, _listenerLogger, dispatcher);
+            
+            if(!_store.TryAdd(listener)){
+                throw new Exception("Cannot register listener");
+            }
+
+            return listener;
+        }
+
+        public IMidiDeviceListener CreateDebug(PortMidi.MidiDeviceInfo device)
+        {
+            IMidiMessageDispatcher dispatcher =
+                new DebugMidiMessageDispatcher(_dispatcherLogger);
 
             IMidiDeviceListener listener = new MidiDeviceListener(device, _listenerLogger, dispatcher);
             

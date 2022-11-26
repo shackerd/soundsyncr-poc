@@ -95,5 +95,26 @@ namespace Midicontrol.Midi
         }
     }
 
-      
+    internal class DebugMidiMessageDispatcher : IMidiMessageDispatcher
+    {
+        private readonly ILogger _logger;
+
+        public IEnumerable<IMidiMessageSink> Sinks =>  Enumerable.Empty<IMidiMessageSink>();
+
+        public DebugMidiMessageDispatcher(ILogger<IMidiMessageDispatcher> logger)
+        {
+            _logger = logger;
+        }
+
+        public Task BroadcastAsync(MidiMessage message)
+        {
+            _logger.LogInformation(message.ToString());
+            return Task.CompletedTask;
+        }
+
+        public Task InitializeAsync()
+        {
+            return Task.CompletedTask;
+        }
+    }
 }

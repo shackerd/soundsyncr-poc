@@ -12,7 +12,7 @@ namespace Midicontrol.Midi
             _logger = logger;            
         }
 
-        public string Name => "Debug Sink";
+        public string Name => "Debug";
 
         public Task InitializeAsync()
         {

@@ -17,31 +17,27 @@ namespace Midicontrol
     public class Program {
         public static void Main(string[] args)
         {                        
-            ITypeRegistrar registrar = Setup();
+            SayHello();
+
+            if(!TrySetup(out ITypeRegistrar registrar )) return;
 
             CommandApp app = new CommandApp(registrar);                    
 
             app.Configure(config => {
                 config                
+                    .AddCommand<DebugCommand>("debug");
+                config
                     .AddCommand<DeviceCommand>("device")
-                    .WithAlias("dev");
-            });             
-            
-            SayHello();
+                    .WithAlias("dev");                    
+            });                                 
             
             // app.Run(args);
-            app.Run(new string[2]{"device", "--list"});            
+            app.Run(new string[2]{"debug", ""});            
         }
 
-        private static ITypeRegistrar Setup(){
+        private static bool TrySetup(out ITypeRegistrar registrar){
 
-            IServiceCollection services = new ServiceCollection();
-            DeserializerBuilder builder = new DeserializerBuilder();
-            builder
-                .WithNamingConvention(CamelCaseNamingConvention.Instance);
-
-            var deserializer = builder.Build();
-            var configMap = deserializer.Deserialize<ConfigMap>(File.ReadAllText("mapping.yml"));
+            IServiceCollection services = new ServiceCollection();            
             
             Log.Logger = new LoggerConfiguration()                       
                 .WriteTo.SpectreConsole("{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}", minLevel: LogEventLevel.Debug)
@@ -52,10 +48,17 @@ namespace Midicontrol
 #endif                    
                 .CreateLogger();
             
+            if (!TryLoadConfiguration(out ConfigMap configMap))
+            {
+                registrar = null;
+                return false;
+            }            
+
+            services.AddSingleton<ConfigMap>((_) => configMap);
+
             services.AddSingleton<SynchronizationContext>();
 
             services.AddSingleton<PulseAudioClient>();         
-            services.AddSingleton<ConfigMap>((_) => configMap);
 
             services.AddTransient<IMidiMessageSink, PulseAudioMidiSink>();
             services.AddTransient<IMidiMessageSink, DebugMidiMessageSink>();
@@ -63,9 +66,32 @@ namespace Midicontrol
             services.AddSingleton<IMidiDeviceListenerFactory, MidiDeviceListenerFactory>();
             services.AddLogging(builder => builder.AddSerilog(dispose: false));
                             
-            return new TypeRegistrar(services);
+            registrar = new TypeRegistrar(services);
+
+            return true;
         }
-                
+
+        private static bool TryLoadConfiguration(out ConfigMap configMap) {
+            
+            IDeserializer deserializer =
+                new DeserializerBuilder()
+                    .WithNamingConvention(CamelCaseNamingConvention.Instance)
+                    .Build();
+            
+            try
+            {
+                configMap = deserializer.Deserialize<ConfigMap>(File.ReadAllText("mapping.yml"));
+                Log.Logger.Information("Loaded configuration");
+                return true;
+            }
+            catch (System.Exception)
+            {
+                configMap = null;
+                Log.Logger.Warning("Cannot load configuration file");
+                return false;
+            }
+        }
+
         private static void SayHello()
         {
             using HttpClient client = new HttpClient();

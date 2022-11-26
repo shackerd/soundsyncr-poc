@@ -1,6 +1,7 @@
 modules:
   - "PulseAudio"
   - "Launcher"
+  - "Debug"
 devicesMap: 
   - deviceName: "nanoKONTROL2 nanoKONTROL2 _ CTR"
     sinks:   
@@ -20,13 +21,15 @@ devicesMap:
             params:
               - action: "PlaybackStream.Volume"
                 destination: "chrome"
-      - name: "Test"
+      - name: "Debug_DISABLED"
         bindings: 
-          - controller: 1
-            params:
-              - action: "PlaybackStream.Volume"
-                destination: "chrome"      
           - controller: 2
             params:
-              - action: "PlaybackStream.Volume"
+              - action: "Debug.Action1"
+                destination: "chrome"      
+              - action: "Debug.Action2"
+                destination: "other"
+          - controller: 1
+            params:
+              - action: "Debug.Action3"
                 destination: "teams"
