@@ -39,7 +39,7 @@ namespace Midicontrol.PulseAudio
             {
                 uint value = PulseAudioMidiValueConverter.FromCCValueToVolume((uint)arg.Value);
 
-                if(!_client.StreamStore.PlaybackStreams.Any())
+                if(!_client.StreamStore.AllStreams.Any())
                 {
                     return;
                 }
