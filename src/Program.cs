@@ -26,13 +26,17 @@ namespace Midicontrol
             app.Configure(config => {
                 config                
                     .AddCommand<DebugCommand>("debug");
+                    
                 config
                     .AddCommand<DeviceCommand>("device")
-                    .WithAlias("dev");                    
-            });                                 
+                    .WithAlias("dev");     
+                
+            }); 
+
+            app.SetDefaultCommand<DeviceCommand>();
             
             // app.Run(args);
-            app.Run(new string[2]{"debug", ""});            
+            app.Run(args);            
         }
 
         private static bool TrySetup(out ITypeRegistrar registrar){
