@@ -1,6 +1,15 @@
+modules:
+  - "PulseAudio"
+  - "Launcher"
 devicesMap: 
   - deviceName: "nanoKONTROL2 nanoKONTROL2 _ CTR"
-    sinks:    
+    sinks:   
+      - name: "Launcher" 
+        bindings:
+          - controller: 18
+            params:
+              - action: "start"
+              - destination: "chrome"
       - name: "PulseAudio"
         bindings: 
           - controller: 1

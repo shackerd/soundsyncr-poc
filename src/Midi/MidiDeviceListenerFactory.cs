@@ -17,7 +17,7 @@ namespace Midicontrol.Midi
         private readonly ILogger<IMidiDeviceListener> _listenerLogger;
         private readonly ILogger<IMidiMessageDispatcher> _dispatcherLogger;
         private readonly IMidiListenerStore _store;
-        private readonly MidiBindingMap _bindingMap;
+        private readonly ConfigMap _bindingMap;
 
         public MidiDeviceListenerFactory(
             SynchronizationContext synchronizationContext,
@@ -25,7 +25,7 @@ namespace Midicontrol.Midi
             ILogger<IMidiDeviceListener> listenerLogger,
             ILogger<IMidiMessageDispatcher> dispatcherLogger,
             IMidiListenerStore store,
-            MidiBindingMap bindingMap
+            ConfigMap bindingMap
         )
         {
             _synchronizationContext = synchronizationContext;
@@ -39,8 +39,8 @@ namespace Midicontrol.Midi
         public IMidiDeviceListener Create(PortMidi.MidiDeviceInfo device)
         {
 
-            var map = _bindingMap.DeviceMaps.FirstOrDefault(d => d.DeviceName.Equals(device.Name));
-            var sinks = _sinks.Where(s => map.Sinks.Any(m => m.Sink.Equals(s.Name)));
+            var map = _bindingMap.DevicesMap.FirstOrDefault(d => d.DeviceName.Equals(device.Name));
+            var sinks = _sinks.Where(s => map.Sinks.Any(m => m.Name.Equals(s.Name)));
 
             IMidiMessageDispatcher dispatcher =
                 new MidiMessageDispatcher(_dispatcherLogger, sinks, map.Sinks, _synchronizationContext);

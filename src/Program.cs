@@ -9,6 +9,8 @@ using Serilog.Events;
 using Serilog.Sinks.SpectreConsole;
 using Spectre.Console;
 using Midicontrol.Infrastructure.Bindings;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace Midicontrol
 {
@@ -34,7 +36,13 @@ namespace Midicontrol
         private static ITypeRegistrar Setup(){
 
             IServiceCollection services = new ServiceCollection();
+            DeserializerBuilder builder = new DeserializerBuilder();
+            builder
+                .WithNamingConvention(CamelCaseNamingConvention.Instance);
 
+            var deserializer = builder.Build();
+            var configMap = deserializer.Deserialize<ConfigMap>(File.ReadAllText("mapping.yml"));
+            
             Log.Logger = new LoggerConfiguration()                       
                 .WriteTo.SpectreConsole("{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}", minLevel: LogEventLevel.Debug)
                 .Enrich.FromLogContext()                
@@ -47,7 +55,7 @@ namespace Midicontrol
             services.AddSingleton<SynchronizationContext>();
 
             services.AddSingleton<PulseAudioClient>();         
-            services.AddSingleton<MidiBindingMap>((_) => CreateBindingMap());
+            services.AddSingleton<ConfigMap>((_) => configMap);
 
             services.AddTransient<IMidiMessageSink, PulseAudioMidiSink>();
             services.AddTransient<IMidiMessageSink, DebugMidiMessageSink>();
@@ -57,44 +65,7 @@ namespace Midicontrol
                             
             return new TypeRegistrar(services);
         }
-
-        private static MidiBindingMap CreateBindingMap() 
-        {
-            var map = new MidiBindingMap() { DeviceMaps = new List<MidiDeviceMap>() };
-            map.DeviceMaps.Add(
-                new MidiDeviceMap() {
-                    DeviceName = "nanoKONTROL2 nanoKONTROL2 _ CTR",
-                    Sinks = new List<MidiSinkMap>() {
-                        new MidiSinkMap() {
-                            Bindings = new List<MidiBinding>() {
-                                new MidiBinding() {
-                                    Controller = 1,
-                                    Params = new List<MidiSinkParam>() {
-                                        new MidiSinkParam() {
-                                            Action = "PlaybackStream.Volume",
-                                            Destination = "teams"
-                                        }
-                                    }
-                                },
-                                new MidiBinding() {
-                                    Controller = 2,
-                                    Params = new List<MidiSinkParam>() {
-                                        new MidiSinkParam() {
-                                            Action = "PlaybackStream.Volume",
-                                            Destination = "chrome"
-                                        }
-                                    }
-                                }
-                            },
-                            Sink = "Pulse Audio"
-                        }
-                    }
-
-                }
-            );
-            return map;
-        }
-
+                
         private static void SayHello()
         {
             using HttpClient client = new HttpClient();

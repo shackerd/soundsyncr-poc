@@ -11,7 +11,7 @@ namespace Midicontrol.PulseAudio
         private const string _playbackStreamVolumeAction = "PlaybackStream.Volume";
         private const string _recordStreamVolumeAction = "RecordStream.Volume";
 
-        public string Name => "Pulse Audio";
+        public string Name => "PulseAudio";
 
         public PulseAudioMidiSink(PulseAudioClient client, ILogger<PulseAudioMidiSink> logger)
         {

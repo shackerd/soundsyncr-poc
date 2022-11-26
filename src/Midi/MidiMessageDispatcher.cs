@@ -40,7 +40,7 @@ namespace Midicontrol.Midi
         {
             foreach (IMidiMessageSink sink in _sinks)
             {
-                MidiSinkMap sinkMap = _maps.FirstOrDefault(s => s.Sink == sink.Name);
+                MidiSinkMap sinkMap = _maps.FirstOrDefault(s => s.Name == sink.Name);
 
                 await sink.InitializeAsync().ConfigureAwait(false);
             }
@@ -76,7 +76,7 @@ namespace Midicontrol.Midi
 
         private IEnumerable<IMidiMessageSinkArgs> BuildSinkArgs(MidiMessage message, IMidiMessageSink sink)  // TryBuildSinkArgs -> bool + out param
         {
-            MidiSinkMap map = _maps.FirstOrDefault(m => m.Sink.Equals(sink.Name));
+            MidiSinkMap map = _maps.FirstOrDefault(m => m.Name.Equals(sink.Name));
 
             if(map == null) 
             {
