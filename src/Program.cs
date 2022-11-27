@@ -36,7 +36,7 @@ namespace Midicontrol
             }); 
 
             
-            
+            app.SetDefaultCommand<StartCommand>();
             // app.Run(new string[] { "list", "sinks"});
             app.Run(args);            
         }
