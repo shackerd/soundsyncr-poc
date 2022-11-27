@@ -6,6 +6,7 @@ namespace Midicontrol.Midi
     {
         IMidiDeviceListener GetListener(string deviceName);
         bool TryAdd(IMidiDeviceListener listener);
+        IEnumerable<IMidiDeviceListener> GetActiveListeners();
     }
 
     public class MidiListenerStore : IMidiListenerStore
@@ -17,6 +18,11 @@ namespace Midicontrol.Midi
         {
             _logger = logger;
             _listeners = new Dictionary<string, IMidiDeviceListener>();
+        }
+
+        public IEnumerable<IMidiDeviceListener> GetActiveListeners()
+        {
+            return _listeners.Values.Where(l => l.IsListening);
         }
 
         public IMidiDeviceListener GetListener(string deviceName)

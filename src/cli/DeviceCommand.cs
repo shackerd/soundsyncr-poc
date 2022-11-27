@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Midicontrol.Infrastructure.Bindings;
 using Midicontrol.Midi;
@@ -7,14 +8,14 @@ using Spectre.Console.Cli;
 
 namespace Midicontrol.CLI
 {
-    internal class DeviceCommand : AsyncCommand<DeviceCommandSettings>
+    internal class StartCommand : AsyncCommand<StartCommandSettings>
     {        
         private readonly IMidiDeviceListenerFactory _listenerFactory;
-        private readonly ILogger<DeviceCommand> _logger;
+        private readonly ILogger<StartCommand> _logger;
         private readonly IMidiListenerStore _store;
         private readonly ConfigMap _config;
 
-        public DeviceCommand(IMidiDeviceListenerFactory listenerFactory, ILogger<DeviceCommand> logger, IMidiListenerStore store, ConfigMap config)
+        public StartCommand(IMidiDeviceListenerFactory listenerFactory, ILogger<StartCommand> logger, IMidiListenerStore store, ConfigMap config)
         {            
             _listenerFactory = listenerFactory;
             _logger = logger;
@@ -25,97 +26,46 @@ namespace Midicontrol.CLI
         // xmidicontrol start        
         // xmidicontrol list sinks
         // xmidicontrol list listener --map
-        public override async Task<int> ExecuteAsync(CommandContext context, DeviceCommandSettings settings)
+        public override async Task<int> ExecuteAsync(CommandContext context, StartCommandSettings settings)
         {                        
-            if(settings.List){
-                Table table = new Table();
-                table.AddColumns("Id", "Interface", "Name", "Input", "Output", "Opened");
-                table.Border(TableBorder.Rounded);
+            List<Task> listenerTasks = new();
 
-                foreach (var item in PortMidi.MidiDeviceManager.AllDevices)
-                {
-                    table.AddRow(
-                        item.ID.ToString(), 
-                        item.Interface, 
-                        item.Name, 
-                        item.IsInput.ToString(), 
-                        item.IsOutput.ToString(), 
-                        item.IsOpened.ToString()
-                    );
+            foreach (var item in _config.DevicesMap)
+            {
+                var device = 
+                    PortMidi
+                        .MidiDeviceManager
+                        .AllDevices
+                        .FirstOrDefault(d => d.Name == item.DeviceName && !d.IsOutput);
+
+                if(!device.IsInput){
+                    // struct type, so we double check this property to know if device has been found
+                    continue;
                 }
 
-                AnsiConsole.Write(table);                            
-            }
-            // if(settings.SetDefault){
-            if(true) {
+                IMidiDeviceListener listener = _listenerFactory.Create(device);
+                                
+                listenerTasks.Add(listener.StartAsync());
 
-                foreach (var item in _config.DevicesMap)
+                // xmidicontrol list sinks
+                var sinks = _store.GetListener(device.Name).Dispatcher.Sinks.Select(s => s.Name);
+
+                // var root = new Tree($"Sinks for {device.Name}");
+
+
+                foreach (var sink in sinks)
                 {
-                    var device = 
-                        PortMidi
-                            .MidiDeviceManager
-                            .AllDevices
-                            .FirstOrDefault(d => d.Name == item.DeviceName && !d.IsOutput);
-
-                    if(!device.IsInput){
-                        // struct type, so we double check this property to know if device has been found
-                        continue;
-                    }
-
-                    IMidiDeviceListener listener = _listenerFactory.Create(device);
-                                    
-                    var listenerTask = listener.StartAsync().ConfigureAwait(false);                
-
-                    // xmidicontrol list sinks
-                    var sinks = _store.GetListener(device.Name).Dispatcher.Sinks.Select(s => s.Name);
-
-                    // var root = new Tree($"Sinks for {device.Name}");
-
-
-                    foreach (var sink in sinks)
-                    {
-                        _logger.LogInformation($"Enabling {sink} for {device.Name}");
-                        // root.AddNode(sink);                                        
-                    }
-                    
-                    // AnsiConsole.Write(root);
-                }                
-
-                Console.ReadLine();
-            }
+                    _logger.LogInformation($"Enabling {sink} for {device.Name}");
+                    // root.AddNode(sink);                                        
+                }
+                
+                // AnsiConsole.Write(root);
+            }                
+            
+            Console.ReadLine();
+            
             // Omitted
             return 0;
         }        
-    }
-
-    internal class DebugCommand : AsyncCommand<DeviceCommandSettings>
-    {
-        private readonly IMidiDeviceListenerFactory _listenerFactory;
-
-        public DebugCommand(IMidiDeviceListenerFactory listenerFactory) 
-        {
-            _listenerFactory = listenerFactory;
-        }
-
-        public override async Task<int> ExecuteAsync(CommandContext context, DeviceCommandSettings settings)
-        {
-                        
-            string deviceName = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
-                    .Title("Select [green]device[/]")                                        
-                    .AddChoices(
-                        PortMidi
-                            .MidiDeviceManager
-                            .AllDevices.Where(d => d.IsInput).Select(d => d.Name)
-                    ));
-
-            var device = PortMidi.MidiDeviceManager.AllDevices.FirstOrDefault(d => d.Name.Equals(deviceName) && d.IsInput);
-            IMidiDeviceListener listener = _listenerFactory.CreateDebug(device);
-            var listenerTask = listener.StartAsync().ConfigureAwait(false);                
-
-            Console.ReadLine();
-
-            return 0;
-        }
-    }
+    }    
 }

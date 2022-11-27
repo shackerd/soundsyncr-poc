@@ -11,6 +11,7 @@ namespace Midicontrol.Midi
         Task StopAsync();
         IMidiMessageDispatcher Dispatcher { get; }
         string DeviceName { get; }
+        bool IsListening { get; }
     }
 
     internal class MidiDeviceListener : IDisposable, IMidiDeviceListener
@@ -34,6 +35,9 @@ namespace Midicontrol.Midi
         public IMidiMessageDispatcher Dispatcher => _dispatcher;
 
         public string DeviceName => _device.Name;
+
+        public bool IsListening => _listening;
+
 
         public MidiDeviceListener(
             PortMidi.MidiDeviceInfo device, 

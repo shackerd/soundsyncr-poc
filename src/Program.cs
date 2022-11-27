@@ -26,14 +26,15 @@ namespace Midicontrol
             app.Configure(config => {
                 config                
                     .AddCommand<DebugCommand>("debug");
-                    
+                config                
+                    .AddCommand<ListCommand>("list")
+                    .WithAlias("ls");
                 config
-                    .AddCommand<DeviceCommand>("device")
-                    .WithAlias("dev");     
+                    .AddCommand<StartCommand>("stat");   
                 
             }); 
 
-            app.SetDefaultCommand<DeviceCommand>();
+            app.SetDefaultCommand<StartCommand>();
             
             // app.Run(args);
             app.Run(args);            
