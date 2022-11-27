@@ -31,8 +31,11 @@ namespace Midicontrol
                     .WithAlias("ls");
                 config
                     .AddCommand<StartCommand>("start");   
-                
+                    
+                config.Settings.ApplicationName = "xmidicontrol";
             }); 
+
+            
             
             // app.Run(new string[] { "list", "sinks"});
             app.Run(args);            
