@@ -26,13 +26,13 @@ namespace Midicontrol.CLI
         // xmidicontrol start        
         // xmidicontrol list sinks
         // xmidicontrol list listener --map
-        public override async Task<int> ExecuteAsync(CommandContext context, StartCommandSettings settings)
+        public override Task<int> ExecuteAsync(CommandContext context, StartCommandSettings settings)
         {                        
             List<Task> listenerTasks = new();
 
             foreach (var item in _config.DevicesMap)
             {
-                var device = 
+                PortMidi.MidiDeviceInfo device = 
                     PortMidi
                         .MidiDeviceManager
                         .AllDevices
@@ -48,24 +48,19 @@ namespace Midicontrol.CLI
                 listenerTasks.Add(listener.StartAsync());
 
                 // xmidicontrol list sinks
-                var sinks = _store.GetListener(device.Name).Dispatcher.Sinks.Select(s => s.Name);
-
-                // var root = new Tree($"Sinks for {device.Name}");
+                IEnumerable<string> sinks = _store.GetListener(device.Name).Dispatcher.Sinks.Select(s => s.Name);
 
 
                 foreach (var sink in sinks)
                 {
-                    _logger.LogInformation($"Enabling {sink} for {device.Name}");
-                    // root.AddNode(sink);                                        
+                    _logger.LogInformation($"Enabling {sink} for {device.Name}");                                   
                 }
-                
-                // AnsiConsole.Write(root);
             }                
             
             Console.ReadLine();
             
             // Omitted
-            return 0;
+            return Task.FromResult(0);
         }        
     }    
 }
