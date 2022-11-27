@@ -30,13 +30,11 @@ namespace Midicontrol
                     .AddCommand<ListCommand>("list")
                     .WithAlias("ls");
                 config
-                    .AddCommand<StartCommand>("stat");   
+                    .AddCommand<StartCommand>("start");   
                 
             }); 
-
-            app.SetDefaultCommand<StartCommand>();
             
-            // app.Run(args);
+            // app.Run(new string[] { "list", "sinks"});
             app.Run(args);            
         }
 

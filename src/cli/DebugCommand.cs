@@ -14,20 +14,19 @@ namespace Midicontrol.CLI
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context)
-        {
-                        
-            string deviceName = AnsiConsole.Prompt(
-                new SelectionPrompt<string>()
+        {                        
+            PortMidi.MidiDeviceInfo device = AnsiConsole.Prompt(
+                new SelectionPrompt<PortMidi.MidiDeviceInfo>()                    
                     .Title("Select [green]device[/]")                                        
+                    .UseConverter((d) => d.Name)                    
                     .AddChoices(
                         PortMidi
                             .MidiDeviceManager
-                            .AllDevices.Where(d => d.IsInput).Select(d => d.Name)
+                            .AllDevices.Where(d => d.IsInput)
                     ));
 
-            var device = PortMidi.MidiDeviceManager.AllDevices.FirstOrDefault(d => d.Name.Equals(deviceName) && d.IsInput);
             IMidiDeviceListener listener = _listenerFactory.CreateDebug(device);
-            var listenerTask = listener.StartAsync().ConfigureAwait(false);                
+            Task listenerTask = listener.StartAsync();                
 
             Console.ReadLine();
 
