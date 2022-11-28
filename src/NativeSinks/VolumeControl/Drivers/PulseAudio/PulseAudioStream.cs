@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Midicontrol.Midi.NativeSinks.PulseAudio;
 using Midicontrol.PulseAudio.DBus;
 using Tmds.DBus;
 
@@ -22,12 +23,12 @@ namespace Midicontrol.PulseAudio
         public IReadOnlyDictionary<string, string> Properties => _readProperties;    
         public uint[] Volume => _properties.Volume;
 
-        internal PulseAudioStream(IStreamProxy proxy, ICoreProxy coreProxy, StreamProperties properties, PulseAudioStreamType type, Dictionary<string, string> readProperties)
+        internal PulseAudioStream(IStreamProxy proxy, ICoreProxy coreProxy, StreamProperties properties, PulseAudioStreamType type, IReadOnlyDictionary<string, string> readProperties)
         {
             Proxy = proxy;            
             Type = type;
             _properties = properties;
-            _readProperties = new ReadOnlyDictionary<string, string>(readProperties);                        
+            _readProperties = readProperties;
             _coreProxy = coreProxy;
 
             // Proxy.WatchDeviceUpdatedAsync()                        
@@ -73,36 +74,16 @@ namespace Midicontrol.PulseAudio
                 .SetAsync(_volumeProperty, _properties.Volume).ConfigureAwait(false);
         }
 
-        public static async Task<PulseAudioStream> CreateAsync(IStreamProxy proxy, ICoreProxy coreProxy, PulseAudioStreamType type)
+        public static async Task<PulseAudioStream> CreateAsync(IStreamProxy proxy, ICoreProxy coreProxy, PulseAudioStreamType type, IPulseAudioPropertyReader reader)
         {            
             StreamProperties props = await proxy.GetAllAsync();
 
-            Dictionary<string, string> kvs = new Dictionary<string, string>();
-
-            foreach (string key in props.PropertyList.Keys)
-            {
-                kvs.Add(key, System.Text.Encoding.UTF8.GetString(GetPropertyValue(props, key)));
-            }
-
+            IReadOnlyDictionary<string, string> kvs = reader.ReadAll(props.PropertyList);
             PulseAudioStream stream = new PulseAudioStream(proxy, coreProxy, props, type, kvs);            
 
             await stream.ListenToChangesAsync().ConfigureAwait(false);
 
             return stream;
-        }
-
-        private static byte[] GetPropertyValue(StreamProperties properties, string propName) 
-        {
-            byte[] rawValue = properties.PropertyList[propName];
-
-            byte[] value = new byte[rawValue.Length - 1];
-
-            for (int i = 0; i < rawValue.Length - 1; i++)
-            {
-                value[i] = rawValue[i];
-            }
-
-            return value;
         }
     }
 

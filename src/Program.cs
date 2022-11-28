@@ -11,6 +11,7 @@ using Spectre.Console;
 using Midicontrol.Infrastructure.Bindings;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using Midicontrol.Midi.NativeSinks.PulseAudio;
 
 namespace Midicontrol
 {
@@ -65,6 +66,7 @@ namespace Midicontrol
             services.AddSingleton<SynchronizationContext>();
 
             services.AddSingleton<PulseAudioClient>();         
+            services.AddTransient<IPulseAudioPropertyReader, PulseAudioPropertyReader>();
 
             services.AddTransient<IMidiMessageSink, PulseAudioMidiSink>();
             services.AddTransient<IMidiMessageSink, DebugMidiMessageSink>();

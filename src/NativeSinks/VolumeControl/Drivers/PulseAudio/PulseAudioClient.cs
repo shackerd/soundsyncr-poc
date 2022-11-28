@@ -2,6 +2,7 @@ using Tmds.DBus;
 using Midicontrol.PulseAudio.DBus;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Midicontrol.Midi.NativeSinks.PulseAudio;
 
 namespace Midicontrol.PulseAudio
 {  
@@ -14,6 +15,7 @@ namespace Midicontrol.PulseAudio
         private readonly SynchronizationContext _synCtx;
         private readonly ILogger _logger;
         private readonly ILogger<IPulseAudioStreamStore> _storeLogger;
+        private readonly IPulseAudioPropertyReader _propertyReader;
 
         private IPulseAudioStreamStore _streamStore;
         private bool _initialized;
@@ -22,11 +24,12 @@ namespace Midicontrol.PulseAudio
 
         public IPulseAudioStreamStore StreamStore => _streamStore;
 
-        public PulseAudioClient(SynchronizationContext synCtx, ILogger<PulseAudioClient> logger, ILogger<IPulseAudioStreamStore> storeLogger)
+        public PulseAudioClient(SynchronizationContext synCtx, ILogger<PulseAudioClient> logger, ILogger<IPulseAudioStreamStore> storeLogger, IPulseAudioPropertyReader propertyReader)
         {
             _synCtx = synCtx;
             _logger = logger;
             _storeLogger = storeLogger;
+            _propertyReader = propertyReader;
         }
 
         private async Task<string> ServerLookupAsync(){
@@ -62,7 +65,7 @@ namespace Midicontrol.PulseAudio
 
             ConnectionInfo inf = await _connection.ConnectAsync().ConfigureAwait(false);
 
-            _streamStore = new PulseAudioStreamStore(_connection, _storeLogger);
+            _streamStore = new PulseAudioStreamStore(_connection, _storeLogger, _propertyReader);
 
             await _streamStore.InitializeAsync().ConfigureAwait(false);
 

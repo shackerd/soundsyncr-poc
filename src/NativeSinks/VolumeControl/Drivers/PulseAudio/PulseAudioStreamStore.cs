@@ -1,6 +1,7 @@
 using Tmds.DBus;
 using Midicontrol.PulseAudio.DBus;
 using Microsoft.Extensions.Logging;
+using Midicontrol.Midi.NativeSinks.PulseAudio;
 
 namespace Midicontrol.PulseAudio
 {
@@ -24,11 +25,12 @@ namespace Midicontrol.PulseAudio
         private readonly ILogger _logger;
         private readonly List<PulseAudioStream> _streams = new List<PulseAudioStream>();
         private readonly PulseAudioStreamWatchdog _watchdog;
+        private readonly IPulseAudioPropertyReader _reader;
         public IEnumerable<PulseAudioStream> RecordStreams => _streams.Where(s => s.Type == PulseAudioStreamType.RecordStream);
         public IEnumerable<PulseAudioStream> PlaybackStreams => _streams.Where(s => s.Type == PulseAudioStreamType.PlaybackStream);
         public IEnumerable<PulseAudioStream> AllStreams => _streams.AsEnumerable();
 
-        public PulseAudioStreamStore(Connection connection, ILogger<IPulseAudioStreamStore> logger)
+        public PulseAudioStreamStore(Connection connection, ILogger<IPulseAudioStreamStore> logger, IPulseAudioPropertyReader reader)
         {
             if (connection == null)
             {
@@ -39,6 +41,7 @@ namespace Midicontrol.PulseAudio
             _logger = logger;
             _proxy = _connection.CreateProxy<ICoreProxy>(_coreSeviceName, _core1ObjectPath);
             _watchdog = new PulseAudioStreamWatchdog(_proxy);
+            _reader = reader;
         }
 
         public Task InitializeAsync()
@@ -131,7 +134,7 @@ namespace Midicontrol.PulseAudio
         {
             IStreamProxy streamProxy = connection.CreateProxy<IStreamProxy>(_streamServiceName, path);
             ICoreProxy coreProxy = connection.CreateProxy<ICoreProxy>(_coreSeviceName, _core1ObjectPath);
-            PulseAudioStream stream = await PulseAudioStream.CreateAsync(streamProxy, coreProxy, type).ConfigureAwait(false);
+            PulseAudioStream stream = await PulseAudioStream.CreateAsync(streamProxy, coreProxy, type, _reader).ConfigureAwait(false);
             return stream;
         }        
     }       

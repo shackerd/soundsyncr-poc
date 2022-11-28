@@ -5,15 +5,15 @@ using Spectre.Console.Cli;
 namespace Midicontrol.CLI
 {
     internal class ListCommand : AsyncCommand<ListCommandSettings>
-    {        
+    {
         private readonly IEnumerable<IMidiMessageSink> _sinks;
 
         public ListCommand(IEnumerable<IMidiMessageSink> sinks)
         {
-            _sinks = sinks;    
+            _sinks = sinks;
         }
         public override async Task<int> ExecuteAsync(CommandContext context, ListCommandSettings settings)
-        {                  
+        {
             switch (settings.Type)
             {
                 case ListCommandEntityType.Devices:
@@ -22,7 +22,7 @@ namespace Midicontrol.CLI
                 case ListCommandEntityType.Sinks:
                     ShowSinks();
                     break;
-            }      
+            }
             return 0;
         }
 
@@ -34,8 +34,8 @@ namespace Midicontrol.CLI
             foreach (var item in PortMidi.MidiDeviceManager.AllDevices.Where(d => d.IsInput))
             {
                 table.AddRow(
-                    item.Interface, 
-                    item.Name, 
+                    item.Interface,
+                    item.Name,
                     item.IsOpened.ToString()
                 );
             }
@@ -49,7 +49,7 @@ namespace Midicontrol.CLI
             table.Border(TableBorder.Rounded);
 
             foreach (var sink in _sinks)
-            {                
+            {
                 table.AddRow(
                     sink.Name
                 );

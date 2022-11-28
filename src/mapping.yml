@@ -2,34 +2,62 @@ modules:
   - "PulseAudio"
   - "Launcher"
   - "Debug"
-devicesMap: 
+devicesMap:
   - deviceName: "nanoKONTROL2 nanoKONTROL2 _ CTR"
-    sinks:   
-      - name: "Launcher" 
+    sinks:
+      - name: "Launcher"
         bindings:
           - controller: 18
             params:
               - action: "start"
               - destination: "chrome"
-      - name: "PulseAudio"
-        bindings: 
+      - name: "PulseAudio" # obsolete
+        bindings:
           - controller: 1
             params:
               - action: "PlaybackStream.Volume"
-                destination: "teams"
+                destination: "teams-insiders"
           - controller: 2
             params:
               - action: "PlaybackStream.Volume"
                 destination: "chrome"
       - name: "Debug_DISABLED"
-        bindings: 
+        bindings:
           - controller: 2
             params:
               - action: "Debug.Action1"
-                destination: "chrome"      
+                destination: "chrome"
               - action: "Debug.Action2"
                 destination: "other"
           - controller: 1
             params:
               - action: "Debug.Action3"
                 destination: "teams"
+      - name: "VolumeControl"
+        bindings:
+          - controller: 2
+            params:
+              - action: "bind://channel/playback"
+                destination: "chrome"
+          - controller: 1
+            params:
+              - action: "bind://channel/playback"
+                destination: "teams"
+              - action: "bind://channel/playback"
+                destination: "discord"
+          - controller: 7
+            params:
+              - action: "mute://channel/record"
+                destination: "teams"
+          - controller: 8
+            params:
+              - action: "solo://channel/playback"
+                destination: "teams"
+          - controller: 3
+            params:
+              - action: "bind://device/playback"
+                destination: "Scarlet Audio USB"
+          - controller: 4
+            params:
+              - action: "bind://device/record"
+                destination: "Scarlet Audio USB"
