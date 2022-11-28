@@ -75,6 +75,19 @@ namespace Midicontrol.PulseAudio
         {
             CoreProperties core = await proxy.GetAllAsync().ConfigureAwait(false);
 
+            List<DeviceProperties> devices = new();
+            foreach (var sink in core.Sinks)
+            {
+                var sinkProxy = _connection.CreateProxy<IDevice>("org.PulseAudio.Core1.Device", sink);
+                var sinkProps = await sinkProxy.GetAllAsync();
+                devices.Add(sinkProps);
+                // source = mic
+                // sink = output
+                // PulseAudioStream abstract
+                // Create class stream for device volume
+                // Or create a volume control sink, IVolume interface
+            }
+
             foreach (ObjectPath path in core.PlaybackStreams)
             {
                 PulseAudioStream stream = await GetStreamObjectAsync(_connection, path, PulseAudioStreamType.PlaybackStream).ConfigureAwait(false);
