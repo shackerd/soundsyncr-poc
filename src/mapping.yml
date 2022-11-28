@@ -37,7 +37,7 @@ devicesMap:
         bindings:
           - controller: 2
             params:
-              - action: "bind://channel/playback"
+              - action: "bind://channel/playback?mode=TwoWay"
                 destination: "chrome"
           - controller: 1
             params:
