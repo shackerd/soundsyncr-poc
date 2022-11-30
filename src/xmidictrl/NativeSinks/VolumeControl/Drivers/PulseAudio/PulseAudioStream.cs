@@ -23,7 +23,13 @@ namespace Midicontrol.PulseAudio
         public IReadOnlyDictionary<string, string> Properties => _readProperties;    
         public uint[] Volume => _properties.Volume;
 
-        internal PulseAudioStream(IStreamProxy proxy, ICoreProxy coreProxy, StreamProperties properties, PulseAudioStreamType type, IReadOnlyDictionary<string, string> readProperties)
+        internal PulseAudioStream(
+                IStreamProxy proxy,
+                ICoreProxy coreProxy,
+                StreamProperties properties,
+                PulseAudioStreamType type,
+                IReadOnlyDictionary<string, string> readProperties
+        )
         {
             Proxy = proxy;            
             Type = type;

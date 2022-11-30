@@ -12,13 +12,15 @@ using Midicontrol.Infrastructure.Bindings;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Midicontrol.Midi.NativeSinks.PulseAudio;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("xmidictrl.tests")]
 namespace Midicontrol
 {
     public class Program {
         public static void Main(string[] args)
         {
-            Midi.NativeSinks.VolumeSinkAction action = "bind://channel/playback?mode=TwoWay";
+            Midi.NativeSinks.VolumeControlAction action = "bind://channel/playback?mode=TwoWay";
 
             SayHello();
 

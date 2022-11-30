@@ -4,6 +4,10 @@ modules:
   - "Debug"
 devicesMap:
   - deviceName: "nanoKONTROL2 nanoKONTROL2 _ CTR"
+    controllers:
+      - id: 1
+        valueRange: "0-127"
+        writable: false
     sinks:
       - name: "Launcher"
         bindings:
@@ -11,28 +15,6 @@ devicesMap:
             params:
               - action: "start"
               - destination: "chrome"
-      - name: "PulseAudio" # obsolete
-        bindings:
-          - controller: 1
-            params:
-              - action: "PlaybackStream.Volume"
-                destination: "teams-insiders"
-          - controller: 2
-            params:
-              - action: "PlaybackStream.Volume"
-                destination: "chrome"
-      - name: "Debug_DISABLED"
-        bindings:
-          - controller: 2
-            params:
-              - action: "Debug.Action1"
-                destination: "chrome"
-              - action: "Debug.Action2"
-                destination: "other"
-          - controller: 1
-            params:
-              - action: "Debug.Action3"
-                destination: "teams"
       - name: "VolumeControl"
         bindings:
           - controller: 2
@@ -61,3 +43,25 @@ devicesMap:
             params:
               - action: "bind://device/record"
                 destination: "Scarlet Audio USB"
+      # - name: "PulseAudio" # obsolete
+      #   bindings:
+      #     - controller: 1
+      #       params:
+      #         - action: "PlaybackStream.Volume"
+      #           destination: "teams-insiders"
+      #     - controller: 2
+      #       params:
+      #         - action: "PlaybackStream.Volume"
+      #           destination: "chrome"
+      # - name: "Debug_DISABLED"
+      #   bindings:
+      #     - controller: 2
+      #       params:
+      #         - action: "Debug.Action1"
+      #           destination: "chrome"
+      #         - action: "Debug.Action2"
+      #           destination: "other"
+      #     - controller: 1
+      #       params:
+      #         - action: "Debug.Action3"
+      #           destination: "teams"
