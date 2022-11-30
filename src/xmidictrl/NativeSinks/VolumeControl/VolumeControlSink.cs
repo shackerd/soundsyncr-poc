@@ -29,7 +29,7 @@ namespace Midicontrol.Midi.NativeSinks
 
                 IEnumerable<IAudioStream> streams =
                     _driver
-                        .GetStreams(arg.Destination)
+                        .GetStreamsAsync(arg.Destination)
                         .Result
                         .Where(s => s.Scope == action.Scope && s.Type == action.StreamType);
 

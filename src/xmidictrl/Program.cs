@@ -15,6 +15,7 @@ using Midicontrol.Midi.NativeSinks.PulseAudio;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("xmidictrl.tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 namespace Midicontrol
 {
     public class Program {

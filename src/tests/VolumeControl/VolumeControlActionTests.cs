@@ -1,5 +1,4 @@
 using System;
-using Midicontrol.CLI;
 using Midicontrol.Midi.NativeSinks;
 using Xunit;
 

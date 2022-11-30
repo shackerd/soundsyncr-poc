@@ -4,7 +4,7 @@ namespace Midicontrol.Midi.NativeSinks
     interface IAudioDriver
     {
         Task InitializeAsync();
-        Task<IEnumerable<IAudioStream>> GetStreams(string destination);
+        Task<IEnumerable<IAudioStream>> GetStreamsAsync(string destination);
         Task ToggleSoloAsync(IAudioStream stream, bool solo);
     }
 }
