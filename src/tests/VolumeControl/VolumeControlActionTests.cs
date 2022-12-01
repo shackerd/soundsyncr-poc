@@ -2,7 +2,7 @@ using System;
 using Midicontrol.Midi.NativeSinks;
 using Xunit;
 
-namespace tests;
+namespace Midicontrol.Tests;
 
 public class VolumeControlActionTests
 {

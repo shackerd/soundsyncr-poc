@@ -9,7 +9,7 @@ using Midicontrol.Midi.NativeSinks;
 using Moq;
 using Xunit;
 
-namespace tests;
+namespace Midicontrol.Tests;
 
 public class VolumeControlSinkTests
 {

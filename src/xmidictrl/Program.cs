@@ -13,6 +13,9 @@ using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
 using Midicontrol.Midi.NativeSinks.PulseAudio;
 using System.Runtime.CompilerServices;
+using MediatR.Pipeline;
+using MediatR;
+using System.Reflection;
 
 [assembly: InternalsVisibleTo("xmidictrl.tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
@@ -25,7 +28,7 @@ namespace Midicontrol
 
             SayHello();
 
-            if(!TrySetup(out ITypeRegistrar registrar )) return;
+            if(!TrySetup(out ITypeRegistrar? registrar )) return;
 
             CommandApp app = new CommandApp(registrar);
 
@@ -47,7 +50,7 @@ namespace Midicontrol
             app.Run(args);
         }
 
-        private static bool TrySetup(out ITypeRegistrar registrar){
+        private static bool TrySetup(out ITypeRegistrar? registrar){
 
             IServiceCollection services = new ServiceCollection();
 
@@ -78,6 +81,8 @@ namespace Midicontrol
             services.AddSingleton<IMidiListenerStore, MidiListenerStore>();
             services.AddSingleton<IMidiDeviceListenerFactory, MidiDeviceListenerFactory>();
             services.AddLogging(builder => builder.AddSerilog(dispose: false));
+
+            services.AddMediatR(Assembly.GetExecutingAssembly());
 
             registrar = new TypeRegistrar(services);
 
