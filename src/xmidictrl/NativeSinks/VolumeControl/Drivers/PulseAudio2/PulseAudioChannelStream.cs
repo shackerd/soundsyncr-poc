@@ -3,30 +3,28 @@ using Midicontrol.PulseAudio.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
 {
-    internal sealed class PulseAudioStream : IAudioStream
+    internal sealed class PulseAudioChannelStream : IAudioStream
     {
 
         // private bool disposedValue;
-        private readonly ILogger<PulseAudioStream> _logger;
+        private readonly ILogger<PulseAudioChannelStream> _logger;
         private readonly IStreamProxy _proxy;
 
-        public Scope Scope { get; }
+        public Scope Scope => Scope.Channel;
 
         public StreamType Type { get; }
 
         public string Identifier { get; }
 
 
-        public PulseAudioStream(
+        public PulseAudioChannelStream(
             string identifier,
-            Scope scope,
             StreamType type,
             IStreamProxy proxy,
-            ILogger<PulseAudioStream> logger
+            ILogger<PulseAudioChannelStream> logger
         )
         {
             Identifier = identifier;
-            Scope = scope;
             Type = type;
             _proxy = proxy;
             _logger = logger;

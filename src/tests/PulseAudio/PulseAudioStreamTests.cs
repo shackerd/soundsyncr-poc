@@ -13,12 +13,11 @@ namespace Midicontrol.Tests
         [Fact]
         public async Task ShouldThrowAnExceptionWhenProxyIsNotInitialized()
         {
-            Mock<ILogger<PulseAudioStream>> mockLogger = new();
+            Mock<ILogger<PulseAudioChannelStream>> mockLogger = new();
 
-            PulseAudioStream stream =
-                new PulseAudioStream(
+            PulseAudioChannelStream stream =
+                new PulseAudioChannelStream(
                     "",
-                    Midi.NativeSinks.Scope.Channel,
                     Midi.NativeSinks.StreamType.Playback,
 #pragma warning disable CS8625  // Wanted scenario
                     null,
@@ -44,17 +43,16 @@ namespace Midicontrol.Tests
         [InlineData(false)]
         public async Task ShouldToggleMute(bool mute)
         {
-            Mock<ILogger<PulseAudioStream>> mockLogger = new();
+            Mock<ILogger<PulseAudioChannelStream>> mockLogger = new();
             Mock<IStreamProxy> mockProxy = new();
 
             mockProxy
                 .Setup(p => p.SetAsync(It.IsAny<string>(), It.IsAny<bool>())) // SetAsync("Mute", val)
                 .Verifiable();
 
-            PulseAudioStream stream =
-                new PulseAudioStream(
+            PulseAudioChannelStream stream =
+                new PulseAudioChannelStream(
                     "",
-                    Midi.NativeSinks.Scope.Channel,
                     Midi.NativeSinks.StreamType.Playback,
                     mockProxy.Object,
                     mockLogger.Object
@@ -70,17 +68,16 @@ namespace Midicontrol.Tests
         [InlineData(127, 65535)]
         public async Task ShouldSetProperVolume(uint value, uint expectedValue)
         {
-            Mock<ILogger<PulseAudioStream>> mockLogger = new();
+            Mock<ILogger<PulseAudioChannelStream>> mockLogger = new();
             Mock<IStreamProxy> mockProxy = new();
 
             mockProxy
                 .Setup(p => p.SetAsync(It.IsAny<string>(), It.IsAny<uint[]>())) // SetAsync("Volume", val)
                 .Verifiable();
 
-            PulseAudioStream stream =
-                new PulseAudioStream(
+            PulseAudioChannelStream stream =
+                new PulseAudioChannelStream(
                     "",
-                    Midi.NativeSinks.Scope.Channel,
                     Midi.NativeSinks.StreamType.Playback,
                     mockProxy.Object,
                     mockLogger.Object
