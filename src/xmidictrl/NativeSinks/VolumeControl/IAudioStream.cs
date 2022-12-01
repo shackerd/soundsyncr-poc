@@ -1,6 +1,6 @@
 namespace Midicontrol.Midi.NativeSinks
 {
-    internal interface IAudioStream
+    internal interface IAudioStream : IDisposable
     {
         Scope Scope { get; }
         StreamType Type { get; }
