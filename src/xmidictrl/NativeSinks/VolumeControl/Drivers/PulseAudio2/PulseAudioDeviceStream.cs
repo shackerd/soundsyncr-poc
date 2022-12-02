@@ -44,7 +44,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             return _proxy.SetMuteAsync(value);
         }
 
-        protected virtual void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
