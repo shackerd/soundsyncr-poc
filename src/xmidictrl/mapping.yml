@@ -4,10 +4,10 @@ modules:
   - "Debug"
 devicesMap:
   - deviceName: "nanoKONTROL2 nanoKONTROL2 _ CTR"
-    controllers:
-      - id: 1
-        valueRange: "0-127"
-        writable: false
+    # controllers:
+    #   - id: 1
+    #     valueRange: "0-127"
+    #     writable: false
     sinks:
       - name: "Launcher"
         bindings:
@@ -43,16 +43,16 @@ devicesMap:
             params:
               - action: "bind://device/record"
                 destination: "Scarlet Audio USB"
-      # - name: "PulseAudio" # obsolete
-      #   bindings:
-      #     - controller: 1
-      #       params:
-      #         - action: "PlaybackStream.Volume"
-      #           destination: "teams-insiders"
-      #     - controller: 2
-      #       params:
-      #         - action: "PlaybackStream.Volume"
-      #           destination: "chrome"
+      - name: "PulseAudio" # obsolete
+        bindings:
+          - controller: 1
+            params:
+              - action: "PlaybackStream.Volume"
+                destination: "teams-insiders"
+          - controller: 2
+            params:
+              - action: "PlaybackStream.Volume"
+                destination: "msedge"
       # - name: "Debug_DISABLED"
       #   bindings:
       #     - controller: 2
