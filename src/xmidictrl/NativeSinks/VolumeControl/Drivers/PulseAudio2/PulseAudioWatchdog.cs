@@ -12,7 +12,8 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         private IDisposable? _playbackStreamRemovedSubscription;
         private IDisposable? _recordStreamRemovedSubscription;
         private bool disposedValue;
-        private readonly ICoreProxy? _proxy;
+        private ICoreProxy? _proxy;
+        private readonly IPulseAudioConnection _connection;
         private readonly IMediator _mediator;
         private readonly ILogger<PulseAudioWatchdog> _logger;
 
@@ -23,18 +24,19 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
                 throw new ArgumentNullException(nameof(connection));
             }
 
-            _proxy = connection?.Connection?.CreateProxy<ICoreProxy>(PulseAudioDBus.CoreSeviceName, PulseAudioDBus.CoreObjectPath);
-
-            if(_proxy == null) {
-                throw new InvalidOperationException("Cannot create proxy");
-            }
-
+            _connection = connection;
             _mediator = mediator;
             _logger = logger;
         }
 
         public Task InitializeAsync()
         {
+            _proxy = _connection?.Connection?.CreateProxy<ICoreProxy>(PulseAudioDBus.CoreSeviceName, PulseAudioDBus.CoreObjectPath);
+
+            if(_proxy == null) {
+                throw new InvalidOperationException("Cannot create proxy");
+            }
+
             return InitializeAsyncInternal();
         }
 

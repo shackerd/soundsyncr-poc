@@ -31,10 +31,10 @@ devicesMap:
             params:
               - action: "mute://channel/record"
                 destination: "teams"
-          - controller: 8
+          - controller: 48
             params:
-              - action: "solo://channel/playback"
-                destination: "teams"
+              - action: "mute://channel/playback"
+                destination: "chrome"
           - controller: 3
             params:
               - action: "bind://device/playback"

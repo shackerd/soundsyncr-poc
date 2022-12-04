@@ -9,17 +9,20 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
     {
         private readonly ILogger<PulseAudioDriver> _logger;
         private readonly IPulseAudioConnection _connection;
+        private readonly PulseAudioWatchdog _watchdog;
         private readonly IMediator _mediator;
 
 
         public PulseAudioDriver(
             ILogger<PulseAudioDriver> logger,
             IPulseAudioConnection connection,
+            PulseAudioWatchdog watchdog,
             IMediator mediator
         )
         {
             _logger = logger;
             _connection = connection;
+            _watchdog = watchdog;
             _mediator = mediator;
         }
         public Task InitializeAsync()
@@ -61,6 +64,8 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             {
                 await _mediator.Send(new PulseAudioStreamGetRequest(item, Scope.Device, StreamType.Record));
             }
+
+            await _watchdog.InitializeAsync();
         }
 
 

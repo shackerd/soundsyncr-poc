@@ -74,6 +74,7 @@ namespace Midicontrol
 
             services.AddSingleton<SynchronizationContext>();
             services.AddSingleton<Midi.NativeSinks.PulseAudio.PulseAudioStreamStore>();
+            services.AddSingleton<Midi.NativeSinks.PulseAudio.PulseAudioWatchdog>();
             services.AddSingleton<IPulseAudioConnection, PulseAudioConnection>();
             services.AddSingleton<IAudioDriver, PulseAudioDriver>();
             services.AddSingleton<IMidiMessageSink, VolumeControlSink>();
