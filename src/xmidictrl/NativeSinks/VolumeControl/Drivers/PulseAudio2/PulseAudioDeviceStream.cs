@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Midicontrol.PulseAudio.DBus;
+using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
 {
-    internal sealed class PulseAudioDeviceStream : IAudioStream
+    internal sealed class PulseAudioDeviceStream : IPulseAudioStream
     {
         private readonly IDevice _proxy;
         private readonly ILogger<PulseAudioDeviceStream> _logger;
@@ -14,21 +15,38 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         public StreamType Type { get; }
 
         public string Identifier { get; }
+        public ObjectPath ObjectPath { get; }
 
         public PulseAudioDeviceStream(
             StreamType type,
             string identifier,
+            ObjectPath objectPath,
             IDevice proxy,
             ILogger<PulseAudioDeviceStream> logger
         )
         {
             Type = type;
             Identifier = identifier;
+            ObjectPath = objectPath;
             _proxy = proxy;
             _logger = logger;
         }
 
-        public async Task<uint> GetVolumeAsync()
+        private void AssertProxyIsAlive()
+        {
+            if(_proxy == null)
+            {
+                throw new InvalidOperationException("Proxy is not initialized");
+            }
+        }
+
+        public Task<uint> GetVolumeAsync()
+        {
+            AssertProxyIsAlive();
+            return GetVolumeAsyncInternal();
+        }
+
+        internal async Task<uint> GetVolumeAsyncInternal()
         {
             uint[] volume = await _proxy.GetVolumeAsync();
             return volume.First();
@@ -36,15 +54,17 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
         public Task SetVolumeAsync(uint value)
         {
+            AssertProxyIsAlive();
             return _proxy.SetVolumeAsync(new uint[1] { value.ToRatioUInt16() });
         }
 
         public Task ToggleMuteAsync(bool value)
         {
+            AssertProxyIsAlive();
             return _proxy.SetMuteAsync(value);
         }
 
-        protected void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {

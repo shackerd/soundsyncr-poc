@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Logging;
 using Midicontrol.PulseAudio.DBus;
+using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
 {
-    internal sealed class PulseAudioChannelStream : IAudioStream
+    internal sealed class PulseAudioChannelStream : IPulseAudioStream
     {
 
         // private bool disposedValue;
@@ -15,16 +16,18 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         public StreamType Type { get; }
 
         public string Identifier { get; }
-
+        public ObjectPath ObjectPath { get; }
 
         public PulseAudioChannelStream(
             string identifier,
+            ObjectPath objectPath,
             StreamType type,
             IStreamProxy proxy,
             ILogger<PulseAudioChannelStream> logger
         )
         {
             Identifier = identifier;
+            ObjectPath = objectPath;
             Type = type;
             _proxy = proxy;
             _logger = logger;

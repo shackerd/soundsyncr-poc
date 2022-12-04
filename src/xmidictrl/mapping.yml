@@ -38,21 +38,21 @@ devicesMap:
           - controller: 3
             params:
               - action: "bind://device/playback"
-                destination: "Scarlet Audio USB"
+                destination: "alsa_output.usb-Focusrite_Scarlett_Solo_USB-00.analog-stereo"
           - controller: 4
             params:
               - action: "bind://device/record"
-                destination: "Scarlet Audio USB"
-      - name: "PulseAudio" # obsolete
-        bindings:
-          - controller: 1
-            params:
-              - action: "PlaybackStream.Volume"
-                destination: "teams-insiders"
-          - controller: 2
-            params:
-              - action: "PlaybackStream.Volume"
-                destination: "msedge"
+                destination: "alsa_output.usb-Focusrite_Scarlett_Solo_USB-00.analog-stereo"
+      # - name: "PulseAudio" # obsolete
+      #   bindings:
+      #     - controller: 1
+      #       params:
+      #         - action: "PlaybackStream.Volume"
+      #           destination: "teams-insiders"
+      #     - controller: 2
+      #       params:
+      #         - action: "PlaybackStream.Volume"
+      #           destination: "msedge"
       # - name: "Debug_DISABLED"
       #   bindings:
       #     - controller: 2

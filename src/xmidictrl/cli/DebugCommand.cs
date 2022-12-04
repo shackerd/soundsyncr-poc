@@ -8,17 +8,17 @@ namespace Midicontrol.CLI
     {
         private readonly IMidiDeviceListenerFactory _listenerFactory;
 
-        public DebugCommand(IMidiDeviceListenerFactory listenerFactory) 
+        public DebugCommand(IMidiDeviceListenerFactory listenerFactory)
         {
             _listenerFactory = listenerFactory;
         }
 
-        public override async Task<int> ExecuteAsync(CommandContext context)
-        {                        
+        public override Task<int> ExecuteAsync(CommandContext context)
+        {
             PortMidi.MidiDeviceInfo device = AnsiConsole.Prompt(
-                new SelectionPrompt<PortMidi.MidiDeviceInfo>()                    
-                    .Title("Select [green]device[/]")                                        
-                    .UseConverter((d) => d.Name)                    
+                new SelectionPrompt<PortMidi.MidiDeviceInfo>()
+                    .Title("Select [green]device[/]")
+                    .UseConverter((d) => d.Name)
                     .AddChoices(
                         PortMidi
                             .MidiDeviceManager
@@ -26,11 +26,11 @@ namespace Midicontrol.CLI
                     ));
 
             IMidiDeviceListener listener = _listenerFactory.CreateDebug(device);
-            Task listenerTask = listener.StartAsync();                
+            Task listenerTask = listener.StartAsync();
 
             Console.ReadLine();
 
-            return 0;
+            return Task.FromResult(0);
         }
     }
 }

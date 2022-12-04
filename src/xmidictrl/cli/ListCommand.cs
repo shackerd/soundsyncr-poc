@@ -12,7 +12,7 @@ namespace Midicontrol.CLI
         {
             _sinks = sinks;
         }
-        public override async Task<int> ExecuteAsync(CommandContext context, ListCommandSettings settings)
+        public override Task<int> ExecuteAsync(CommandContext context, ListCommandSettings settings)
         {
             switch (settings.Type)
             {
@@ -23,7 +23,7 @@ namespace Midicontrol.CLI
                     ShowSinks();
                     break;
             }
-            return 0;
+            return Task.FromResult(0);
         }
 
         private void ShowDevices() {

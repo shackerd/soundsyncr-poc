@@ -18,7 +18,7 @@ namespace Midicontrol.Midi.NativeSinks
         public Task InitializeAsync()
         {
             // if IMidiDevice.Capability == Both (Twoway) -> Write to mididevice volume of streams
-            throw new NotImplementedException();
+            return _driver.InitializeAsync();
         }
 
         public async Task ProcessMessageAsync(IEnumerable<IMidiMessageSinkArgs> args)

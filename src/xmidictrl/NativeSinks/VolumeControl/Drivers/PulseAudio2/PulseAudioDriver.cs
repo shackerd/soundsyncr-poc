@@ -8,86 +8,72 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
     internal sealed class PulseAudioDriver : IAudioDriver
     {
         private readonly ILogger<PulseAudioDriver> _logger;
-        private readonly SynchronizationContext _synCtx;
+        private readonly IPulseAudioConnection _connection;
         private readonly IMediator _mediator;
-        private Connection? _connection;
+
 
         public PulseAudioDriver(
             ILogger<PulseAudioDriver> logger,
-            SynchronizationContext synCtx,
+            IPulseAudioConnection connection,
             IMediator mediator
         )
         {
             _logger = logger;
-            _synCtx = synCtx;
+            _connection = connection;
             _mediator = mediator;
         }
         public Task InitializeAsync()
         {
-            return ConnectAsync();
+            return InitializeAsyncInternal();
         }
 
-        private async Task<string> ServerLookupAsync(){
-
-            Connection sessionConnection = Connection.Session;
-
-            IServerLookupProxy proxy =
-                sessionConnection.CreateProxy<IServerLookupProxy>(
-                    PulseAudioDBus.ServerLookupServiceName,
-                    PulseAudioDBus.ServerLookupObjectPath
-                );
-
-            ServerLookupProperties res = await proxy.GetAllAsync().ConfigureAwait(false);
-
-            return res.Address;
-        }
-
-        private async Task ConnectAsync(){
-
-            string address = await ServerLookupAsync().ConfigureAwait(false);
-
-            ClientConnectionOptions options = new ClientConnectionOptions(address);
-
-            options.SynchronizationContext = _synCtx;
-
-            _connection = new Connection(options);
-
-            _connection.StateChanged += new EventHandler<ConnectionStateChangedEventArgs>(OnConnectionEvent);
-
-            ConnectionInfo inf = await _connection.ConnectAsync().ConfigureAwait(false);
-        }
-
-        private async void OnConnectionEvent(object? _, ConnectionStateChangedEventArgs eventArgs)
+        private async Task InitializeAsyncInternal()
         {
-            _logger.LogInformation($"Pulse Audio : {eventArgs.State}");
+            await _connection.ConnectAsync();
 
-            switch (eventArgs.State)
+            if(_connection.Connection == null){
+                throw new InvalidOperationException();
+            }
+
+            Connection connection = _connection.Connection;
+
+            ICoreProxy proxy =
+                connection.CreateProxy<ICoreProxy>(PulseAudioDBus.CoreSeviceName, PulseAudioDBus.CoreObjectPath);
+
+            CoreProperties props = await proxy.GetAllAsync();
+
+            foreach (var item in props.PlaybackStreams)
             {
-                case ConnectionState.Created:
-                case ConnectionState.Connecting:
-                case ConnectionState.Disconnecting:
-                    break;
-                default:
-                    await _mediator
-                        .Publish(
-                            new PulseAudioConnectionNotification(
-                                eventArgs.State == ConnectionState.Connected,
-                                _connection
-                            )
-                        )
-                        .ConfigureAwait(false);
-                    break;
+                await _mediator.Send(new PulseAudioStreamGetRequest(item, Scope.Channel, StreamType.Playback));
+            }
+
+            foreach (var item in props.RecordStreams)
+            {
+                await _mediator.Send(new PulseAudioStreamGetRequest(item, Scope.Channel, StreamType.Record));
+            }
+
+            foreach (var item in props.Sinks)
+            {
+                await _mediator.Send(new PulseAudioStreamGetRequest(item, Scope.Device, StreamType.Playback));
+            }
+
+            foreach (var item in props.Sources)
+            {
+                await _mediator.Send(new PulseAudioStreamGetRequest(item, Scope.Device, StreamType.Record));
             }
         }
 
-        public Task<IEnumerable<IAudioStream>> GetStreamsAsync(string destination)
+
+        public async Task<IEnumerable<IAudioStream>> GetStreamsAsync(string destination)
         {
-            throw new NotImplementedException();
+            IQueryable<IPulseAudioStream> query = await _mediator.Send(new PulseAudioStreamStoreQueryRequest());
+            return query.Where(s => s.Identifier.Equals(destination)).AsEnumerable();
         }
 
-        public Task ToggleSoloAsync(IAudioStream stream, bool solo)
+        public async Task ToggleSoloAsync(IAudioStream stream, bool solo)
         {
-            throw new NotImplementedException();
+            IQueryable<IPulseAudioStream> query = await _mediator.Send(new PulseAudioStreamStoreQueryRequest());
+            await Task.WhenAll(query.SkipWhile(s => s == (IPulseAudioStream)stream).Select(s => s.ToggleMuteAsync(solo)));
         }
     }
 }

@@ -16,6 +16,7 @@ using System.Runtime.CompilerServices;
 using MediatR.Pipeline;
 using MediatR;
 using System.Reflection;
+using Midicontrol.Midi.NativeSinks;
 
 [assembly: InternalsVisibleTo("xmidictrl.tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
@@ -72,11 +73,15 @@ namespace Midicontrol
             services.AddSingleton<ConfigMap>((_) => configMap);
 
             services.AddSingleton<SynchronizationContext>();
+            services.AddSingleton<Midi.NativeSinks.PulseAudio.PulseAudioStreamStore>();
+            services.AddSingleton<IPulseAudioConnection, PulseAudioConnection>();
+            services.AddSingleton<IAudioDriver, PulseAudioDriver>();
+            services.AddSingleton<IMidiMessageSink, VolumeControlSink>();
 
-            services.AddSingleton<PulseAudioClient>();
-            services.AddTransient<IPulseAudioPropertyReader, PulseAudioPropertyReader>();
+            // services.AddSingleton<PulseAudioClient>();
+            // services.AddTransient<IPulseAudioPropertyReader, PulseAudioPropertyReader>();
 
-            services.AddTransient<IMidiMessageSink, PulseAudioMidiSink>();
+            // services.AddTransient<IMidiMessageSink, PulseAudioMidiSink>();
             services.AddTransient<IMidiMessageSink, DebugMidiMessageSink>();
             services.AddSingleton<IMidiListenerStore, MidiListenerStore>();
             services.AddSingleton<IMidiDeviceListenerFactory, MidiDeviceListenerFactory>();

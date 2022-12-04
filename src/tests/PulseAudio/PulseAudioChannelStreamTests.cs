@@ -4,11 +4,12 @@ using Microsoft.Extensions.Logging;
 using Midicontrol.Midi.NativeSinks.PulseAudio;
 using Midicontrol.PulseAudio.DBus;
 using Moq;
+using Tmds.DBus;
 using Xunit;
 
 namespace Midicontrol.Tests
 {
-    public class PulseAudioStreamTests
+    public class PulseAudioChannelStreamTests
     {
         [Fact]
         public async Task ShouldThrowAnExceptionWhenProxyIsNotInitialized()
@@ -18,6 +19,7 @@ namespace Midicontrol.Tests
             PulseAudioChannelStream stream =
                 new PulseAudioChannelStream(
                     "",
+                    ObjectPath.Root,
                     Midi.NativeSinks.StreamType.Playback,
 #pragma warning disable CS8625  // Wanted scenario
                     null,
@@ -53,6 +55,7 @@ namespace Midicontrol.Tests
             PulseAudioChannelStream stream =
                 new PulseAudioChannelStream(
                     "",
+                    ObjectPath.Root,
                     Midi.NativeSinks.StreamType.Playback,
                     mockProxy.Object,
                     mockLogger.Object
@@ -78,6 +81,7 @@ namespace Midicontrol.Tests
             PulseAudioChannelStream stream =
                 new PulseAudioChannelStream(
                     "",
+                    ObjectPath.Root,
                     Midi.NativeSinks.StreamType.Playback,
                     mockProxy.Object,
                     mockLogger.Object
