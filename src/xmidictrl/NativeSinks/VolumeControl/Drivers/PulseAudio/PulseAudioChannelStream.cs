@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using Midicontrol.PulseAudio.DBus;
+using Midicontrol.Midi.NativeSinks.PulseAudio.DBus;
 using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio

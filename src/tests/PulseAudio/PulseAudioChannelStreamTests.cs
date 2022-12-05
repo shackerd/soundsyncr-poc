@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Midicontrol.Midi.NativeSinks.PulseAudio;
-using Midicontrol.PulseAudio.DBus;
+using Midicontrol.Midi.NativeSinks.PulseAudio.DBus;
 using Moq;
 using Tmds.DBus;
 using Xunit;

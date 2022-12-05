@@ -1,6 +1,6 @@
 using Tmds.DBus;
 
-namespace Midicontrol.PulseAudio.DBus
+namespace Midicontrol.Midi.NativeSinks.PulseAudio.DBus
 {
     [DBusInterface("org.PulseAudio.ServerLookup1")]
     interface IServerLookupProxy : IDBusObject

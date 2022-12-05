@@ -17,12 +17,18 @@ namespace Midicontrol.Tests
         public async Task ShouldPublishConnectionNotificationOnInitialize()
         {
             Mock<ILogger<PulseAudioDriver>> mockLogger = new();
+            Mock<ILogger<IPulseAudioConnection>> mockLoggerConnection = new();
+            Mock<ILogger<PulseAudioWatchdog>> mockLoggerWatcher = new();
             Mock<IMediator> mockMediator = new();
+
+            PulseAudioConnection connection =
+                new PulseAudioConnection(mockLoggerConnection.Object, new SynchronizationContext(), mockMediator.Object);
 
             PulseAudioDriver driver =
                 new PulseAudioDriver(
                     mockLogger.Object,
-                    new SynchronizationContext(),
+                    connection,
+                    new PulseAudioWatchdog(connection, mockMediator.Object, mockLoggerWatcher.Object, new PulseAudioWatchdogHandleStore()),
                     mockMediator.Object
                 );
 

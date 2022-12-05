@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Tmds.DBus;
 
 [assembly: InternalsVisibleTo(Tmds.DBus.Connection.DynamicAssemblyName)]
-namespace Midicontrol.PulseAudio.DBus
+namespace Midicontrol.Midi.NativeSinks.PulseAudio.DBus
 {
     static class SourceExtensions
     {

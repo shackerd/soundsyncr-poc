@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Midicontrol.PulseAudio.DBus;
+using Midicontrol.Midi.NativeSinks.PulseAudio.DBus;
 using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
@@ -69,7 +69,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             IDevice proxy = _connection.CreateProxy<IDevice>(PulseAudioDBus.DeviceServiceName, path);
             DeviceProperties props = await proxy.GetAllAsync();
 
-            PulseAudioDeviceStream stream = new PulseAudioDeviceStream(type, props.Name, path, proxy, _deviceLogger);
+            PulseAudioDeviceStream stream = new PulseAudioDeviceStream(type, props.Name!, path, proxy, _deviceLogger);
 
             return stream;
         }

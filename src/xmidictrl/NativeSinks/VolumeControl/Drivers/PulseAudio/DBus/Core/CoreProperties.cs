@@ -1,6 +1,6 @@
 using Tmds.DBus;
 
-namespace Midicontrol.PulseAudio.DBus
+namespace Midicontrol.Midi.NativeSinks.PulseAudio.DBus
 {
     [Dictionary]
     public class CoreProperties
@@ -19,8 +19,8 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private string _Name = default(string);
-        public string Name
+        private string? _Name = default(string);
+        public string? Name
         {
             get
             {
@@ -33,8 +33,8 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private string _Version = default(string);
-        public string Version
+        private string? _Version = default(string);
+        public string? Version
         {
             get
             {
@@ -61,8 +61,8 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private string _Username = default(string);
-        public string Username
+        private string? _Username = default(string);
+        public string? Username
         {
             get
             {
@@ -75,8 +75,8 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private string _Hostname = default(string);
-        public string Hostname
+        private string? _Hostname = default(string);
+        public string? Hostname
         {
             get
             {
@@ -89,7 +89,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private uint[] _DefaultChannels = default(uint[]);
+        private uint[] _DefaultChannels = default(uint[])!;
         public uint[] DefaultChannels
         {
             get
@@ -145,7 +145,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private ObjectPath[] _Cards = default(ObjectPath[]);
+        private ObjectPath[] _Cards = default(ObjectPath[])!;
         public ObjectPath[] Cards
         {
             get
@@ -159,7 +159,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private ObjectPath[] _Sinks = default(ObjectPath[]);
+        private ObjectPath[] _Sinks = default(ObjectPath[])!;
         public ObjectPath[] Sinks
         {
             get
@@ -187,7 +187,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private ObjectPath[] _Sources = default(ObjectPath[]);
+        private ObjectPath[] _Sources = default(ObjectPath[])!;
         public ObjectPath[] Sources
         {
             get
@@ -215,7 +215,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private ObjectPath[] _PlaybackStreams = default(ObjectPath[]);
+        private ObjectPath[] _PlaybackStreams = default(ObjectPath[])!;
         public ObjectPath[] PlaybackStreams
         {
             get
@@ -229,7 +229,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private ObjectPath[] _RecordStreams = default(ObjectPath[]);
+        private ObjectPath[] _RecordStreams = default(ObjectPath[])!;
         public ObjectPath[] RecordStreams
         {
             get
@@ -243,7 +243,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private ObjectPath[] _Samples = default(ObjectPath[]);
+        private ObjectPath[] _Samples = default(ObjectPath[])!;
         public ObjectPath[] Samples
         {
             get
@@ -257,7 +257,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private ObjectPath[] _Modules = default(ObjectPath[]);
+        private ObjectPath[] _Modules = default(ObjectPath[])!;
         public ObjectPath[] Modules
         {
             get
@@ -271,7 +271,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private ObjectPath[] _Clients = default(ObjectPath[]);
+        private ObjectPath[] _Clients = default(ObjectPath[])!;
         public ObjectPath[] Clients
         {
             get
@@ -299,7 +299,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private string[] _Extensions = default(string[]);
+        private string[] _Extensions = default(string[])!;
         public string[] Extensions
         {
             get

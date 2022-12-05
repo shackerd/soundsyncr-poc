@@ -1,12 +1,12 @@
 using Tmds.DBus;
 
-namespace Midicontrol.PulseAudio.DBus
+namespace Midicontrol.Midi.NativeSinks.PulseAudio.DBus
 {
     [Dictionary]
     class ServerLookupProperties
     {
-        private string _Address = default(string);
-        public string Address
+        private string? _Address = default(string);
+        public string? Address
         {
             get
             {

@@ -1,6 +1,5 @@
 ﻿using Spectre.Console.Cli;
 using Midicontrol.Midi;
-using Midicontrol.PulseAudio;
 using Microsoft.Extensions.DependencyInjection;
 using Midicontrol.Infrastructure;
 using Midicontrol.CLI;
@@ -25,8 +24,9 @@ namespace Midicontrol
     public class Program {
         public static void Main(string[] args)
         {
-            Midi.NativeSinks.VolumeControlAction action = "bind://channel/playback?mode=TwoWay";
-
+            // var device = PortMidi.MidiDeviceManager.AllDevices.First(d => d.Name == "nanoKONTROL2 nanoKONTROL2 _ CTR" && d.IsOutput);
+            // var output = PortMidi.MidiDeviceManager.OpenOutput(device.ID);
+            // output.Write(new PortMidi.MidiEvent() { Message = new PortMidi.MidiMessage(0, 127, 176) });
             SayHello();
 
             if(!TrySetup(out ITypeRegistrar? registrar )) return;
@@ -64,25 +64,32 @@ namespace Midicontrol
 #endif
                 .CreateLogger();
 
-            if (!TryLoadConfiguration(out ConfigMap configMap))
+            if (!TryLoadConfiguration(out ConfigMap? configMap))
             {
                 registrar = null;
                 return false;
             }
 
-            services.AddSingleton<ConfigMap>((_) => configMap);
+            services.AddSingleton<ConfigMap>((_) => configMap!);
 
             services.AddSingleton<SynchronizationContext>();
-            services.AddSingleton<Midi.NativeSinks.PulseAudio.PulseAudioStreamStore>();
-            services.AddSingleton<Midi.NativeSinks.PulseAudio.PulseAudioWatchdog>();
-            services.AddSingleton<IPulseAudioConnection, PulseAudioConnection>();
-            services.AddSingleton<IAudioDriver, PulseAudioDriver>();
+
+            if(OperatingSystem.IsLinux()) {
+
+                services.AddSingleton<Midi.NativeSinks.PulseAudio.PulseAudioStreamStore>();
+                services.AddSingleton<Midi.NativeSinks.PulseAudio.PulseAudioWatchdogHandleStore>();
+                services.AddSingleton<IPulseAudioConnection, PulseAudioConnection>();
+                services.AddSingleton<IPulseAudioWatchdog, PulseAudioWatchdog>();
+                services.AddSingleton<IPulseAudioStreamLoader, PulseAudioStreamLoader>();
+                services.AddSingleton<IAudioDriver, PulseAudioDriver>();
+            }
+
+            if(OperatingSystem.IsWindows()) {
+
+            }
+
             services.AddSingleton<IMidiMessageSink, VolumeControlSink>();
 
-            // services.AddSingleton<PulseAudioClient>();
-            // services.AddTransient<IPulseAudioPropertyReader, PulseAudioPropertyReader>();
-
-            // services.AddTransient<IMidiMessageSink, PulseAudioMidiSink>();
             services.AddTransient<IMidiMessageSink, DebugMidiMessageSink>();
             services.AddSingleton<IMidiListenerStore, MidiListenerStore>();
             services.AddSingleton<IMidiDeviceListenerFactory, MidiDeviceListenerFactory>();
@@ -95,7 +102,7 @@ namespace Midicontrol
             return true;
         }
 
-        private static bool TryLoadConfiguration(out ConfigMap configMap) {
+        private static bool TryLoadConfiguration(out ConfigMap? configMap) {
 
             IDeserializer deserializer =
                 new DeserializerBuilder()

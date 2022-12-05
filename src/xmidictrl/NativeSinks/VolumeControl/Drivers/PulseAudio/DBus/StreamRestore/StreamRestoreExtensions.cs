@@ -1,7 +1,7 @@
 using Tmds.DBus;
 
-namespace Midicontrol.PulseAudio.DBus
-{            
+namespace Midicontrol.Midi.NativeSinks.PulseAudio.DBus
+{
     static class StreamRestoreExtensions
     {
         public static Task<uint> GetInterfaceRevisionAsync(this IStreamRestoreProxy o) => o.GetAsync<uint>("InterfaceRevision");

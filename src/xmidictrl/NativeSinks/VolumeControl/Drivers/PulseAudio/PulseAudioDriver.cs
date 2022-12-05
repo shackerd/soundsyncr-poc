@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Midicontrol.PulseAudio.DBus;
+using Midicontrol.Midi.NativeSinks.PulseAudio.DBus;
 using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
@@ -9,14 +9,14 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
     {
         private readonly ILogger<PulseAudioDriver> _logger;
         private readonly IPulseAudioConnection _connection;
-        private readonly PulseAudioWatchdog _watchdog;
+        private readonly IPulseAudioWatchdog _watchdog;
         private readonly IMediator _mediator;
 
 
         public PulseAudioDriver(
             ILogger<PulseAudioDriver> logger,
             IPulseAudioConnection connection,
-            PulseAudioWatchdog watchdog,
+            IPulseAudioWatchdog watchdog,
             IMediator mediator
         )
         {
@@ -71,8 +71,8 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
         public async Task<IEnumerable<IAudioStream>> GetStreamsAsync(string destination)
         {
-            IQueryable<IPulseAudioStream> query = await _mediator.Send(new PulseAudioStreamStoreQueryRequest());
-            return query.Where(s => s.Identifier.Equals(destination)).AsEnumerable();
+            IEnumerable<IPulseAudioStream> query = await _mediator.Send(new PulseAudioStreamStoreQueryRequest());
+            return query.Where(s => destination.Equals(s.Identifier)).AsEnumerable();
         }
 
         public async Task ToggleSoloAsync(IAudioStream stream, bool solo)

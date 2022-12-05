@@ -1,6 +1,6 @@
 using Tmds.DBus;
 
-namespace Midicontrol.PulseAudio.DBus
+namespace Midicontrol.Midi.NativeSinks.PulseAudio.DBus
 {
     [Dictionary]
     internal class DeviceProperties
@@ -19,8 +19,8 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private string _Name = default(string);
-        public string Name
+        private string? _Name = default(string);
+        public string? Name
         {
             get
             {
@@ -33,8 +33,8 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private string _Driver = default(string);
-        public string Driver
+        private string? _Driver = default(string);
+        public string? Driver
         {
             get
             {
@@ -103,7 +103,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private uint[] _Channels = default(uint[]);
+        private uint[] _Channels = default(uint[])!;
         public uint[] Channels
         {
             get
@@ -117,7 +117,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private uint[] _Volume = default(uint[]);
+        private uint[] _Volume = default(uint[])!;
         public uint[] Volume
         {
             get
@@ -313,7 +313,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private ObjectPath[] _Ports = default(ObjectPath[]);
+        private ObjectPath[] _Ports = default(ObjectPath[])!;
         public ObjectPath[] Ports
         {
             get
@@ -341,8 +341,8 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private IDictionary<string, byte[]> _PropertyList = default(IDictionary<string, byte[]>);
-        public IDictionary<string, byte[]> PropertyList
+        private IDictionary<string, byte[]>? _PropertyList = default(IDictionary<string, byte[]>);
+        public IDictionary<string, byte[]>? PropertyList
         {
             get
             {

@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Midicontrol.PulseAudio.DBus;
+using Midicontrol.Midi.NativeSinks.PulseAudio.DBus;
 using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
@@ -13,7 +13,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
     internal class PulseAudioConnection : IPulseAudioConnection
     {
-        private readonly ILogger<PulseAudioConnection> _logger;
+        private readonly ILogger<IPulseAudioConnection> _logger;
         private readonly SynchronizationContext _synCtx;
         private readonly IMediator _mediator;
         private Connection? _connection;
@@ -21,7 +21,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         public Connection? Connection => _connection;
 
         public PulseAudioConnection(
-            ILogger<PulseAudioConnection> logger,
+            ILogger<IPulseAudioConnection> logger,
             SynchronizationContext synCtx,
             IMediator mediator
         )
@@ -31,7 +31,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             _mediator = mediator;
         }
 
-        private async Task<string> ServerLookupAsync()
+        private async Task<string?> ServerLookupAsync()
         {
 
             Connection sessionConnection = Connection.Session;
@@ -44,7 +44,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
             ServerLookupProperties res = await proxy.GetAllAsync().ConfigureAwait(false);
 
-            return res.Address;
+            return res?.Address;
         }
 
         public Task ConnectAsync()
@@ -55,7 +55,12 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         private async Task ConnectAsyncInternal()
         {
 
-            string address = await ServerLookupAsync().ConfigureAwait(false);
+            string? address = await ServerLookupAsync().ConfigureAwait(false);
+
+            if (string.IsNullOrEmpty(address))
+            {
+                throw new InvalidOperationException("Cannot resolve PulseAudio DBus");
+            }
 
             ClientConnectionOptions options = new ClientConnectionOptions(address);
 

@@ -1,6 +1,6 @@
 using Tmds.DBus;
 
-namespace Midicontrol.PulseAudio.DBus
+namespace Midicontrol.Midi.NativeSinks.PulseAudio.DBus
 {
     [Dictionary]
     public class StreamProperties
@@ -19,8 +19,8 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private string _Driver = default(string);
-        public string Driver
+        private string? _Driver = default(string);
+        public string? Driver
         {
             get
             {
@@ -103,7 +103,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private uint[] _Channels = default(uint[]);
+        private uint[] _Channels = default(uint[])!;
         public uint[] Channels
         {
             get
@@ -117,7 +117,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private uint[] _Volume = default(uint[]);
+        private uint[] _Volume = default(uint[])!;
         public uint[] Volume
         {
             get
@@ -173,8 +173,8 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private string _ResampleMethod = default(string);
-        public string ResampleMethod
+        private string? _ResampleMethod = default(string);
+        public string? ResampleMethod
         {
             get
             {
@@ -187,8 +187,8 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private IDictionary<string, byte[]> _PropertyList = default(IDictionary<string, byte[]>);
-        public IDictionary<string, byte[]> PropertyList
+        private IDictionary<string, byte[]>? _PropertyList = default(IDictionary<string, byte[]>);
+        public IDictionary<string, byte[]>? PropertyList
         {
             get
             {

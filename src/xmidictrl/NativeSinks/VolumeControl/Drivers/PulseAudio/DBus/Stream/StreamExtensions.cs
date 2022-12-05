@@ -1,7 +1,7 @@
 using Tmds.DBus;
 
-namespace Midicontrol.PulseAudio.DBus
-{       
+namespace Midicontrol.Midi.NativeSinks.PulseAudio.DBus
+{
     static class StreamExtensions
     {
         public static Task<uint> GetIndexAsync(this IStreamProxy o) => o.GetAsync<uint>("Index");

@@ -20,12 +20,14 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         private readonly ILogger<PulseAudioStreamStoreInterface> _logger;
         private readonly IMediator _mediator;
         private readonly PulseAudioStreamStore _store;
+        private readonly IPulseAudioStreamLoader _loader;
 
-        public PulseAudioStreamStoreInterface(ILogger<PulseAudioStreamStoreInterface> logger, IMediator mediator, PulseAudioStreamStore store)
+        public PulseAudioStreamStoreInterface(ILogger<PulseAudioStreamStoreInterface> logger, IMediator mediator, PulseAudioStreamStore store, IPulseAudioStreamLoader loader)
         {
             _logger = logger;
             _mediator = mediator;
             _store = store;
+            _loader = loader;
         }
 
         public Task<IPulseAudioStream> Handle(PulseAudioStreamGetRequest request, CancellationToken cancellationToken)
@@ -58,7 +60,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             cancellationToken.ThrowIfCancellationRequested();
 
             Func<IPulseAudioStream, bool> predicate =
-                s => s.Identifier.Equals(notification.Stream.Identifier)
+                s => !string.IsNullOrEmpty(s.Identifier) && s.Identifier.Equals(notification.Stream.Identifier)
                     && s.Scope == notification.Stream.Scope
                     && s.Type == notification.Stream.Type;
 

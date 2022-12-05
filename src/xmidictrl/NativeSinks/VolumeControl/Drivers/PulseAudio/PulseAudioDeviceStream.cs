@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using Midicontrol.PulseAudio.DBus;
+using Midicontrol.Midi.NativeSinks.PulseAudio.DBus;
 using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
@@ -14,12 +14,12 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
         public StreamType Type { get; }
 
-        public string Identifier { get; }
+        public string? Identifier { get; }
         public ObjectPath ObjectPath { get; }
 
         public PulseAudioDeviceStream(
             StreamType type,
-            string identifier,
+            string? identifier,
             ObjectPath objectPath,
             IDevice proxy,
             ILogger<PulseAudioDeviceStream> logger

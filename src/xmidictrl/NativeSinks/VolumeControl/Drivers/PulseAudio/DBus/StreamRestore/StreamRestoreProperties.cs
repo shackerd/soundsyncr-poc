@@ -1,6 +1,6 @@
 using Tmds.DBus;
 
-namespace Midicontrol.PulseAudio.DBus
+namespace Midicontrol.Midi.NativeSinks.PulseAudio.DBus
 {
     [Dictionary]
     class StreamRestoreProperties
@@ -19,7 +19,7 @@ namespace Midicontrol.PulseAudio.DBus
             }
         }
 
-        private ObjectPath[] _Entries = default(ObjectPath[]);
+        private ObjectPath[] _Entries = default(ObjectPath[])!;
         public ObjectPath[] Entries
         {
             get
