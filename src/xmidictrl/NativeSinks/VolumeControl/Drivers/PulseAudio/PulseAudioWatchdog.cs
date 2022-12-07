@@ -67,7 +67,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
                 {
                     IPulseAudioStream? stream =
                         await _mediator.Send<IPulseAudioStream?>(
-                            new PulseAudioStreamLoadRequest(path, Scope.Channel, StreamType.Playback)
+                            new PulseAudioStreamGetRequest(path, Scope.Channel, StreamType.Playback)
                         );
 
                     if (stream == null)
@@ -103,7 +103,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
                 {
                     IPulseAudioStream? stream =
                         await _mediator.Send<IPulseAudioStream?>(
-                            new PulseAudioStreamLoadRequest(path, Scope.Channel, StreamType.Record)
+                            new PulseAudioStreamGetRequest(path, Scope.Channel, StreamType.Record)
                         );
 
                     if (stream == null)

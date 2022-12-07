@@ -40,15 +40,13 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         private async Task<IPulseAudioStream?> HandleInternal(PulseAudioStreamGetRequest request)
         {
             Func<IPulseAudioStream, bool> predicate =
-                s => s.ObjectPath.Equals(request.Path)
-                    && s.Scope == request.Scope
-                    && s.Type == request.Type;
+                s => s.ObjectPath.Equals(request.Path);
 
             IPulseAudioStream? stream = _store.Streams.SingleOrDefault(predicate);
 
             if (stream == null)
             {
-                stream = await _mediator.Send(new PulseAudioStreamLoadRequest(request.Path, request.Scope, request.Type));
+                stream = await _loader.GetAsync(request.Path, request.Scope, request.Type);
 
                 if (stream != null)
                 {
@@ -68,16 +66,11 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
             IEnumerable<IPulseAudioStream> results =
                 _store.Streams.Where(predicate);
-
             switch (notification.Type)
             {
+                // we already loaded stream in HandleInternal
                 case PulseAudioStreamChangeNotificationType.Created:
-                    if(results.Count() > 1){
-                        _logger.LogWarning($"More than one stream match to {notification.Stream.Identifier} on {notification.Type} {notification.Stream.Scope} when adding, skipping");
-                        return Task.CompletedTask;
-                    }
-                    _store.Streams.Add(notification.Stream);
-                    break;
+                    return Task.CompletedTask;
 
                 case PulseAudioStreamChangeNotificationType.Deleted:
 

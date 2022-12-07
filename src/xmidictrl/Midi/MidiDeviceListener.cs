@@ -5,7 +5,7 @@ using Midicontrol.Infrastructure.Bindings;
 namespace Midicontrol.Midi
 {
     public interface IMidiDeviceListener
-    {    
+    {
         void Dispose();
         Task StartAsync();
         Task StopAsync();
@@ -24,10 +24,6 @@ namespace Midicontrol.Midi
         private PortMidi.MidiInput? _input;
         private bool _isDisposing;
         private object _stateLock = new object();
-
-        private SynchronizationContext _synCtx;
-
-        private readonly IEnumerable<IMidiMessageSink> _sinks;        
         private readonly ILogger<IMidiDeviceListener> _logger;
 
         private readonly IMidiMessageDispatcher _dispatcher;
@@ -40,8 +36,8 @@ namespace Midicontrol.Midi
 
 
         public MidiDeviceListener(
-            PortMidi.MidiDeviceInfo device, 
-            ILogger<IMidiDeviceListener> logger, 
+            PortMidi.MidiDeviceInfo device,
+            ILogger<IMidiDeviceListener> logger,
             IMidiMessageDispatcher dispatcher
         )
         {
@@ -112,14 +108,14 @@ namespace Midicontrol.Midi
             return Task.Factory
                 .StartNew(() => Attach())
                 .ContinueWith(
-                    _ => StartAsyncInternal(_cancellationSource.Token, _synCtx),
+                    _ => StartAsyncInternal(_cancellationSource.Token),
                     _cancellationSource.Token,
                     TaskContinuationOptions.NotOnFaulted,
                     TaskScheduler.Current
                 );
         }
 
-        private async Task StartAsyncInternal(CancellationToken cancellationToken, SynchronizationContext context)
+        private async Task StartAsyncInternal(CancellationToken cancellationToken)
         {
             if (_input == null)
             {
@@ -128,10 +124,10 @@ namespace Midicontrol.Midi
 
             await _dispatcher.InitializeAsync().ConfigureAwait(false);
 
-            // indicate to current object that we are listening 
+            // indicate to current object that we are listening
             _listening = true;
 
-            // recommended portmidi lib min value     
+            // recommended portmidi lib min value
             const int msgSize = 100;
 
             // copy stack ref in local scope for safer execution (multi tasks)
@@ -148,22 +144,22 @@ namespace Midicontrol.Midi
 
                 if (hasData)
                 {
-                    // re read buffer as Event object 
+                    // re read buffer as Event object
                     var msg = (MidiMessage)@in.ReadEvent(buffer, 0, msgSize);
 
-                    await _dispatcher.BroadcastAsync(msg).ConfigureAwait(false);                    
+                    await _dispatcher.BroadcastAsync(msg).ConfigureAwait(false);
 
                     // better response time in case of data
                     nextLoopWait = 0;
                 }
 
-                // workaround to lighten CPU load 
+                // workaround to lighten CPU load
                 await Task.Delay(nextLoopWait);
 
 
             } while (!cancellationToken.IsCancellationRequested);
 
-            // indicate to current object that we had stopped listening 
+            // indicate to current object that we had stopped listening
             _listening = false;
         }
 
@@ -203,5 +199,5 @@ namespace Midicontrol.Midi
                 }
             }
         }
-    }    
+    }
 }

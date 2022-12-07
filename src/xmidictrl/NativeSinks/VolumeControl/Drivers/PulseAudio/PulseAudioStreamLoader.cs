@@ -7,7 +7,7 @@ using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
 {
-    internal interface IPulseAudioStreamLoader : IRequestHandler<PulseAudioStreamLoadRequest, IPulseAudioStream?>
+    internal interface IPulseAudioStreamLoader
     {
         Task<IPulseAudioStream?> GetAsync(ObjectPath path, Scope scope, StreamType type);
     }
@@ -127,13 +127,6 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             byte[] value = rawValue.Take(rawValue.Length - 1).ToArray();
 
             return Encoding.Default.GetString(value);
-        }
-
-        public Task<IPulseAudioStream?> Handle(PulseAudioStreamLoadRequest request, CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return GetAsync(request.Path, request.Scope, request.Type);
         }
     }
 }
