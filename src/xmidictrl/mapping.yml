@@ -27,11 +27,11 @@ devicesMap:
                 destination: "teams"
               - action: "bind://channel/playback"
                 destination: "discord"
-          - controller: 7
+          - controller: 49
             params:
-              - action: "mute://channel/record"
+              - action: "mute://channel/playback"
                 destination: "teams"
-          - controller: 48
+          - controller: 50
             params:
               - action: "mute://channel/playback"
                 destination: "chrome"

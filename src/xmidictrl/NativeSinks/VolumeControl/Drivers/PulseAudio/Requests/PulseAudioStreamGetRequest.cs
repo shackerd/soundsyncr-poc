@@ -3,7 +3,7 @@ using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
 {
-    internal class PulseAudioStreamGetRequest : IRequest<IPulseAudioStream>
+    internal class PulseAudioStreamGetRequest : IRequest<IPulseAudioStream?>
     {
         public ObjectPath Path { get; }
         public Scope Scope { get; }

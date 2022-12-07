@@ -7,9 +7,9 @@ using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
 {
-    internal interface IPulseAudioStreamLoader : IRequestHandler<PulseAudioStreamLoadRequest, IPulseAudioStream>
+    internal interface IPulseAudioStreamLoader : IRequestHandler<PulseAudioStreamLoadRequest, IPulseAudioStream?>
     {
-        Task<IPulseAudioStream> GetAsync(ObjectPath path, Scope scope, StreamType type);
+        Task<IPulseAudioStream?> GetAsync(ObjectPath path, Scope scope, StreamType type);
     }
 
     internal class PulseAudioStreamLoader : IPulseAudioStreamLoader
@@ -38,7 +38,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             _proxy = _connection.CreateProxy<ICoreProxy>(PulseAudioDBus.CoreSeviceName, PulseAudioDBus.CoreObjectPath);
         }
 
-        public async Task<IPulseAudioStream> GetAsync(ObjectPath path, Scope scope, StreamType type)
+        public async Task<IPulseAudioStream?> GetAsync(ObjectPath path, Scope scope, StreamType type)
         {
             switch (scope)
             {
@@ -51,25 +51,58 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             }
         }
 
-        private async Task<IPulseAudioStream> LoadChannelStreamAsync(ObjectPath path, StreamType type)
+        private async Task<IPulseAudioStream?> LoadChannelStreamAsync(ObjectPath path, StreamType type)
         {
             IStreamProxy proxy = _connection.CreateProxy<IStreamProxy>(PulseAudioDBus.StreamServiceName, path);
 
-            StreamProperties props = await proxy.GetAllAsync();
+            StreamProperties? props = null;
 
-            IReadOnlyDictionary<string, string> kvs = ReadAll(props.PropertyList);
+            try
+            {
+                if (proxy == null)
+                {
+                    _logger.LogError($"Cannot create proxy for {type} ({path})");
+                    return null;
+                }
+
+                props = await proxy.GetAllAsync();
+            }
+            catch (Tmds.DBus.DBusException ex)
+            {
+                _logger.LogError(ex, $"Stream was removed too early {type} ({path})");
+                return null;
+            }
+
+            IReadOnlyDictionary<string, string> kvs = ReadAll(props!.PropertyList!);
 
             PulseAudioChannelStream stream = new PulseAudioChannelStream(kvs[_applicationProcessBinary], path, type, proxy, _channelLogger);
 
             return stream;
         }
 
-        private async Task<IPulseAudioStream> LoadDeviceStreamAsync(ObjectPath path, StreamType type)
+        private async Task<IPulseAudioStream?> LoadDeviceStreamAsync(ObjectPath path, StreamType type)
         {
             IDevice proxy = _connection.CreateProxy<IDevice>(PulseAudioDBus.DeviceServiceName, path);
-            DeviceProperties props = await proxy.GetAllAsync();
 
-            PulseAudioDeviceStream stream = new PulseAudioDeviceStream(type, props.Name!, path, proxy, _deviceLogger);
+            DeviceProperties? props = null;
+
+            try
+            {
+                if (proxy == null)
+                {
+                    _logger.LogError($"Cannot create proxy for {type} ({path})");
+                    return null;
+                }
+
+                props = await proxy.GetAllAsync();
+            }
+            catch (Tmds.DBus.DBusException ex)
+            {
+                _logger.LogError(ex, $"Stream was removed too early {type} ({path})");
+                return null;
+            }
+
+            PulseAudioDeviceStream stream = new PulseAudioDeviceStream(type, props!.Name!, path, proxy, _deviceLogger);
 
             return stream;
         }
@@ -96,7 +129,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             return Encoding.Default.GetString(value);
         }
 
-        public Task<IPulseAudioStream> Handle(PulseAudioStreamLoadRequest request, CancellationToken cancellationToken)
+        public Task<IPulseAudioStream?> Handle(PulseAudioStreamLoadRequest request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 

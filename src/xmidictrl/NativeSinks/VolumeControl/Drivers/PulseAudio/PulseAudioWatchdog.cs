@@ -65,17 +65,22 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             _newPlaybackStreamSubscription = await _proxy!.WatchNewPlaybackStreamAsync(
                 async (path) =>
                 {
-                    IPulseAudioStream stream =
-                        await _mediator.Send<IPulseAudioStream>(
+                    IPulseAudioStream? stream =
+                        await _mediator.Send<IPulseAudioStream?>(
                             new PulseAudioStreamLoadRequest(path, Scope.Channel, StreamType.Playback)
                         );
 
+                    if (stream == null)
+                    {
+                        return;
+                    }
+
                     await _mediator.Publish(
-                        new PulseAudioStreamChangeNotification(
-                            stream,
-                            PulseAudioStreamChangeNotificationType.Created
-                        )
-                    );
+                            new PulseAudioStreamChangeNotification(
+                                stream!,
+                                PulseAudioStreamChangeNotificationType.Created
+                            )
+                        );
 
                     _logger.LogInformation($"PulseAudio: Created {stream.Scope} {stream.Type} {stream.Identifier}");
 
@@ -96,18 +101,22 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             _newRecordStreamSubscription = await _proxy.WatchNewRecordStreamAsync(
                 async (path) =>
                 {
-                    IPulseAudioStream stream =
-                        await _mediator.Send<IPulseAudioStream>(
+                    IPulseAudioStream? stream =
+                        await _mediator.Send<IPulseAudioStream?>(
                             new PulseAudioStreamLoadRequest(path, Scope.Channel, StreamType.Record)
                         );
 
+                    if (stream == null)
+                    {
+                        return;
+                    }
+
                     await _mediator.Publish(
                         new PulseAudioStreamChangeNotification(
-                            stream,
+                            stream!,
                             PulseAudioStreamChangeNotificationType.Created
                         )
                     );
-
 
                     _logger.LogInformation($"PulseAudio: Created {stream.Scope} {stream.Type} {stream.Identifier}");
                 },
@@ -120,14 +129,18 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             _playbackStreamRemovedSubscription = await _proxy.WatchPlaybackStreamRemovedAsync(
                 async (path) =>
                 {
-                    IPulseAudioStream stream =
-                        await _mediator.Send<IPulseAudioStream>(
+                    IPulseAudioStream? stream =
+                        await _mediator.Send<IPulseAudioStream?>(
                             new PulseAudioStreamGetRequest(path, Scope.Channel, StreamType.Playback)
                         );
 
+                    if(stream == null) {
+                        return;
+                    }
+
                     await _mediator.Publish(
                         new PulseAudioStreamChangeNotification(
-                            stream,
+                            stream!,
                             PulseAudioStreamChangeNotificationType.Deleted
                         )
                     );
@@ -140,14 +153,18 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             _recordStreamRemovedSubscription = await _proxy.WatchRecordStreamRemovedAsync(
                 async (path) =>
                 {
-                    IPulseAudioStream stream =
-                        await _mediator.Send<IPulseAudioStream>(
+                    IPulseAudioStream? stream =
+                        await _mediator.Send<IPulseAudioStream?>(
                             new PulseAudioStreamGetRequest(path, Scope.Channel, StreamType.Record)
                         );
 
+                    if(stream == null) {
+                        return;
+                    }
+
                     await _mediator.Publish(
                         new PulseAudioStreamChangeNotification(
-                            stream,
+                            stream!,
                             PulseAudioStreamChangeNotificationType.Deleted
                         )
                     );

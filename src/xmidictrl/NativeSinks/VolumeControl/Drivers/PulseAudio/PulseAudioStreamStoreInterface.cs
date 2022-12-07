@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
 {
@@ -15,7 +16,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         }
     }
 
-    internal class PulseAudioStreamStoreInterface : IRequestHandler<PulseAudioStreamGetRequest, IPulseAudioStream>, IRequestHandler<PulseAudioStreamStoreQueryRequest, IQueryable<IPulseAudioStream>>, INotificationHandler<PulseAudioStreamChangeNotification>
+    internal class PulseAudioStreamStoreInterface : IRequestHandler<PulseAudioStreamGetRequest, IPulseAudioStream?>, IRequestHandler<PulseAudioStreamStoreQueryRequest, IQueryable<IPulseAudioStream>>, INotificationHandler<PulseAudioStreamChangeNotification>
     {
         private readonly ILogger<PulseAudioStreamStoreInterface> _logger;
         private readonly IMediator _mediator;
@@ -30,13 +31,13 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             _loader = loader;
         }
 
-        public Task<IPulseAudioStream> Handle(PulseAudioStreamGetRequest request, CancellationToken cancellationToken)
+        public Task<IPulseAudioStream?> Handle(PulseAudioStreamGetRequest request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             return HandleInternal(request);
         }
 
-        private async Task<IPulseAudioStream> HandleInternal(PulseAudioStreamGetRequest request)
+        private async Task<IPulseAudioStream?> HandleInternal(PulseAudioStreamGetRequest request)
         {
             Func<IPulseAudioStream, bool> predicate =
                 s => s.ObjectPath.Equals(request.Path)
@@ -49,7 +50,10 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             {
                 stream = await _mediator.Send(new PulseAudioStreamLoadRequest(request.Path, request.Scope, request.Type));
 
-                _store.Streams.Add(stream);
+                if (stream != null)
+                {
+                    _store.Streams.Add(stream);
+                }
             }
 
             return stream;
@@ -60,9 +64,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             cancellationToken.ThrowIfCancellationRequested();
 
             Func<IPulseAudioStream, bool> predicate =
-                s => !string.IsNullOrEmpty(s.Identifier) && s.Identifier.Equals(notification.Stream.Identifier)
-                    && s.Scope == notification.Stream.Scope
-                    && s.Type == notification.Stream.Type;
+                s => s.ObjectPath != default(ObjectPath) && s.ObjectPath.Equals(notification.Stream.ObjectPath);
 
             IEnumerable<IPulseAudioStream> results =
                 _store.Streams.Where(predicate);
