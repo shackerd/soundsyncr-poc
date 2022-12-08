@@ -75,7 +75,15 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
             IReadOnlyDictionary<string, string> kvs = ReadAll(props!.PropertyList!);
 
-            PulseAudioChannelStream stream = new PulseAudioChannelStream(kvs[_applicationProcessBinary], path, type, proxy, _channelLogger);
+            IPulseAudioStream? rootStream = await LoadDeviceStreamAsync(props.Device, type);
+
+            if (rootStream == null)
+            {
+                _logger.LogWarning($"Cannot load device stream ({props.Device}), {type} stream is now orphaned ({path}), skipping...");
+                return null;
+            }
+
+            PulseAudioChannelStream stream = new PulseAudioChannelStream(rootStream, kvs[_applicationProcessBinary], path, type, proxy, _channelLogger);
 
             return stream;
         }

@@ -9,6 +9,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
         // private bool disposedValue;
         private readonly ILogger<PulseAudioChannelStream> _logger;
+        private readonly IAudioStream _rootStream;
         private readonly IStreamProxy _proxy;
 
         public Scope Scope => Scope.Channel;
@@ -18,7 +19,10 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         public string Identifier { get; }
         public ObjectPath ObjectPath { get; }
 
+        public IAudioStream? Root => _rootStream;
+
         public PulseAudioChannelStream(
+            IAudioStream rootStream,
             string identifier,
             ObjectPath objectPath,
             StreamType type,
@@ -26,6 +30,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             ILogger<PulseAudioChannelStream> logger
         )
         {
+            _rootStream = rootStream;
             Identifier = identifier;
             ObjectPath = objectPath;
             Type = type;

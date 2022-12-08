@@ -78,7 +78,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         public async Task ToggleSoloAsync(IAudioStream stream, bool solo)
         {
             IQueryable<IPulseAudioStream> query = await _mediator.Send(new PulseAudioStreamStoreQueryRequest());
-            await Task.WhenAll(query.SkipWhile(s => s == (IPulseAudioStream)stream).Select(s => s.ToggleMuteAsync(solo)));
+            await Task.WhenAll(query.SkipWhile(s => s == (IPulseAudioStream)stream && s == stream.Root).Select(s => s.ToggleMuteAsync(solo)));
         }
     }
 }

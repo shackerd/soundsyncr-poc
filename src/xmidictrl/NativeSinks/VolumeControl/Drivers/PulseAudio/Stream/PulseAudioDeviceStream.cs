@@ -17,6 +17,8 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         public string? Identifier { get; }
         public ObjectPath ObjectPath { get; }
 
+        public IAudioStream? Root => null;
+
         public PulseAudioDeviceStream(
             StreamType type,
             string? identifier,

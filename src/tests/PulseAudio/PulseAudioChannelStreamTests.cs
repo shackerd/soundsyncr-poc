@@ -18,6 +18,7 @@ namespace Midicontrol.Tests
 
             PulseAudioChannelStream stream =
                 new PulseAudioChannelStream(
+                    new PulseAudioDeviceStream(Midi.NativeSinks.StreamType.Playback, "", ObjectPath.Root, null!, null!),
                     "",
                     ObjectPath.Root,
                     Midi.NativeSinks.StreamType.Playback,
@@ -54,6 +55,7 @@ namespace Midicontrol.Tests
 
             PulseAudioChannelStream stream =
                 new PulseAudioChannelStream(
+                    new PulseAudioDeviceStream(Midi.NativeSinks.StreamType.Playback, "", ObjectPath.Root, null!, null!),
                     "",
                     ObjectPath.Root,
                     Midi.NativeSinks.StreamType.Playback,
@@ -80,6 +82,7 @@ namespace Midicontrol.Tests
 
             PulseAudioChannelStream stream =
                 new PulseAudioChannelStream(
+                    new PulseAudioDeviceStream(Midi.NativeSinks.StreamType.Playback, "", ObjectPath.Root, null!, null!),
                     "",
                     ObjectPath.Root,
                     Midi.NativeSinks.StreamType.Playback,
