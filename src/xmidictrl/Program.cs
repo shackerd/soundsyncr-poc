@@ -17,6 +17,7 @@ using MediatR;
 using System.Reflection;
 using Midicontrol.Midi.NativeSinks;
 using Midicontrol.Midi.NativeSinks.VolumeControl;
+using Midicontrol.Midi.NativeSinks.MicrosoftAudio;
 
 [assembly: InternalsVisibleTo("xmidictrl.tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
@@ -75,21 +76,7 @@ namespace Midicontrol
 
             services.AddSingleton<SynchronizationContext>();
 
-            if(OperatingSystem.IsLinux()) {
-
-                services.AddSingleton<Midi.NativeSinks.PulseAudio.PulseAudioStreamStore>();
-                services.AddSingleton<Midi.NativeSinks.PulseAudio.PulseAudioWatchdogHandleStore>();
-                services.AddSingleton<IPulseAudioConnection, PulseAudioConnection>();
-                services.AddSingleton<IPulseAudioWatchdog, PulseAudioWatchdog>();
-                services.AddSingleton<IPulseAudioStreamLoader, PulseAudioStreamLoader>();
-                services.AddSingleton<IAudioDriver, PulseAudioDriver>();
-            }
-
-            if(OperatingSystem.IsWindows()) {
-
-            }
-
-            services.AddSingleton<IMidiMessageSink, VolumeControlSink>();
+            services.AddVolumeControlSink();
 
             services.AddTransient<IMidiMessageSink, DebugMidiMessageSink>();
             services.AddSingleton<IMidiListenerStore, MidiListenerStore>();
