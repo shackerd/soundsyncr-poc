@@ -40,7 +40,7 @@ namespace Midicontrol.Midi
         {
             foreach (IMidiMessageSink sink in _sinks)
             {
-                MidiSinkMap sinkMap = _maps.FirstOrDefault(s => s.Name == sink.Name);
+                // MidiSinkMap? sinkMap = _maps.FirstOrDefault(s => sink.Name.Equals(s.Name));
 
                 await sink.InitializeAsync().ConfigureAwait(false);
             }
@@ -78,22 +78,26 @@ namespace Midicontrol.Midi
 
         private IEnumerable<IMidiMessageSinkArgs> BuildSinkArgs(MidiMessage message, IMidiMessageSink sink)  // TryBuildSinkArgs -> bool + out param
         {
-            MidiSinkMap map = _maps.FirstOrDefault(m => m.Name.Equals(sink.Name));
+            MidiSinkMap? map = _maps.FirstOrDefault(m => sink.Name.Equals(m.Name));
 
             if(map == null)
             {
                 return Enumerable.Empty<IMidiMessageSinkArgs>();
             }
 
-            MidiBinding binding =
-                map.Bindings.FirstOrDefault(b => b.Controller == (int)message.Controller);
+            MidiBinding? binding =
+                map.Bindings?.FirstOrDefault(b => b.Controller == (int)message.Controller);
 
-            if(binding == null)
+            if(binding == null || binding.Params == null)
             {
                 return Enumerable.Empty<IMidiMessageSinkArgs>();
             }
 
-            return binding.Params.Select(p => new MidiMessageSinkArgs(p.Action, p.Destination, (int)message.Value));
+            return binding
+                .Params
+                .Where(p => p.Action != null && p.Destination != null)
+                .Select(p => new MidiMessageSinkArgs(p.Action!, p.Destination!, (int)message.Value))
+                ?? Enumerable.Empty<IMidiMessageSinkArgs>();
         }
     }
 

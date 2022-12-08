@@ -6,7 +6,7 @@ namespace Midicontrol.Midi
 {
     public interface IMidiDeviceListenerFactory
     {
-        IMidiDeviceListener Create(MidiDeviceInfo device);
+        IMidiDeviceListener? Create(MidiDeviceInfo device);
         IMidiDeviceListener CreateDebug(PortMidi.MidiDeviceInfo device);
     }
 
@@ -37,12 +37,16 @@ namespace Midicontrol.Midi
             _bindingMap = bindingMap;
         }
 
-        public IMidiDeviceListener Create(PortMidi.MidiDeviceInfo device)
+        public IMidiDeviceListener? Create(PortMidi.MidiDeviceInfo device)
         {
 
-            MidiDeviceMap? map = _bindingMap.DevicesMap.FirstOrDefault(d => d.DeviceName.Equals(device.Name));
+            MidiDeviceMap? map = _bindingMap.DevicesMap?.FirstOrDefault(d => device.Name.Equals(d.DeviceName));
 
-            IEnumerable<IMidiMessageSink> sinks = _sinks.Where(s => map.Sinks.Any(m => m.Name.Equals(s.Name)));
+            if(map == null || map.Sinks == null){
+                return null;
+            }
+
+            IEnumerable<IMidiMessageSink> sinks = _sinks.Where(s => map.Sinks.Any(m => s.Name.Equals(m.Name)));
 
             IMidiMessageDispatcher dispatcher =
                 new MidiMessageDispatcher(_dispatcherLogger, sinks, map.Sinks, _synchronizationContext);

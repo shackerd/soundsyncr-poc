@@ -48,7 +48,13 @@ namespace Midicontrol.CLI
                     continue;
                 }
 
-                IMidiDeviceListener listener = _listenerFactory.Create(device);
+                IMidiDeviceListener? listener = _listenerFactory.Create(device);
+
+                if (listener == null)
+                {
+                    _logger.LogInformation($"Cannot create listener for {device.Name}, skipping");
+                    continue;
+                }
 
                 listenerTasks.Add(listener.StartAsync());
 
