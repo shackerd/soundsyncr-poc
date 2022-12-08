@@ -16,6 +16,7 @@ using MediatR.Pipeline;
 using MediatR;
 using System.Reflection;
 using Midicontrol.Midi.NativeSinks;
+using Midicontrol.Midi.NativeSinks.VolumeControl;
 
 [assembly: InternalsVisibleTo("xmidictrl.tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

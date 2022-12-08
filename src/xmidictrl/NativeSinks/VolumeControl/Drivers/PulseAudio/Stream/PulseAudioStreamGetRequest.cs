@@ -1,4 +1,5 @@
 using MediatR;
+using Midicontrol.Midi.NativeSinks.VolumeControl;
 using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio

@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Midicontrol.Midi.NativeSinks.PulseAudio.DBus;
+using Midicontrol.Midi.NativeSinks.VolumeControl;
 using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
@@ -75,10 +76,14 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             return query.Where(s => destination.Equals(s.Identifier)).AsEnumerable();
         }
 
-        public async Task ToggleSoloAsync(IAudioStream stream, bool solo)
+        public async Task ToggleSoloAsync(IAudioStream stream, StreamType type, bool solo)
         {
-            IQueryable<IPulseAudioStream> query = await _mediator.Send(new PulseAudioStreamStoreQueryRequest());
-            await Task.WhenAll(query.SkipWhile(s => s == (IPulseAudioStream)stream && s == stream.Root).Select(s => s.ToggleMuteAsync(solo)));
+            IEnumerable<IPulseAudioStream> query = await _mediator.Send(new PulseAudioStreamStoreQueryRequest());
+
+            ObjectPath root = (((IPulseAudioStream)stream).Root as IPulseAudioStream)?.ObjectPath ?? default(ObjectPath);
+            var muteStreams = query.Where(s => s.Type == type && s != (IPulseAudioStream)stream && (s.ObjectPath != root) && s.Scope == Scope.Channel);
+
+            await Task.WhenAll(muteStreams.Select(s => s.ToggleMuteAsync(solo)));
         }
     }
 }

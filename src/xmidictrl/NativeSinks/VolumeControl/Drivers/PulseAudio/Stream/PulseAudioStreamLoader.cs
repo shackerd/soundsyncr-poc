@@ -3,6 +3,7 @@ using System.Text;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Midicontrol.Midi.NativeSinks.PulseAudio.DBus;
+using Midicontrol.Midi.NativeSinks.VolumeControl;
 using Tmds.DBus;
 
 namespace Midicontrol.Midi.NativeSinks.PulseAudio
@@ -109,6 +110,10 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
                 _logger.LogError(ex, $"Stream was removed too early {type} ({path})");
                 return null;
             }
+
+            IReadOnlyDictionary<string, string> kvs = ReadAll(props!.PropertyList!);
+
+            string name = kvs["device.description"];
 
             PulseAudioDeviceStream stream = new PulseAudioDeviceStream(type, props!.Name!, path, proxy, _deviceLogger);
 

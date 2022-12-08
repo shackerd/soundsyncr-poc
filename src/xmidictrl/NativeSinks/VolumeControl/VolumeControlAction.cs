@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 
-namespace Midicontrol.Midi.NativeSinks
+namespace Midicontrol.Midi.NativeSinks.VolumeControl
 {
     public class VolumeControlAction
     {

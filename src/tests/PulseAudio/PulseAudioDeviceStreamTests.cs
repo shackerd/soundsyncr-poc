@@ -18,7 +18,7 @@ namespace Midicontrol.Tests
 
             PulseAudioDeviceStream stream =
                 new PulseAudioDeviceStream(
-                    Midi.NativeSinks.StreamType.Playback,
+                    Midi.NativeSinks.VolumeControl.StreamType.Playback,
                     "Fake Sound Card",
                     ObjectPath.Root,
 #pragma warning disable CS8625  // Wanted scenario
@@ -54,7 +54,7 @@ namespace Midicontrol.Tests
 
             PulseAudioDeviceStream stream =
                 new PulseAudioDeviceStream(
-                    Midi.NativeSinks.StreamType.Playback,
+                    Midi.NativeSinks.VolumeControl.StreamType.Playback,
                     "Fake Sound Card",
                     ObjectPath.Root,
                     mockProxy.Object,
@@ -80,7 +80,7 @@ namespace Midicontrol.Tests
 
             PulseAudioDeviceStream stream =
                 new PulseAudioDeviceStream(
-                    Midi.NativeSinks.StreamType.Playback,
+                    Midi.NativeSinks.VolumeControl.StreamType.Playback,
                     "Fake Sound Card",
                     ObjectPath.Root,
                     mockProxy.Object,

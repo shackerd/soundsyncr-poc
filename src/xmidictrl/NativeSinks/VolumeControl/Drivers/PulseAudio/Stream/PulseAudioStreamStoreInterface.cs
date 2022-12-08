@@ -16,7 +16,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         }
     }
 
-    internal class PulseAudioStreamStoreInterface : IRequestHandler<PulseAudioStreamGetRequest, IPulseAudioStream?>, IRequestHandler<PulseAudioStreamStoreQueryRequest, IQueryable<IPulseAudioStream>>, INotificationHandler<PulseAudioStreamChangeNotification>
+    internal class PulseAudioStreamStoreInterface : IRequestHandler<PulseAudioStreamGetRequest, IPulseAudioStream?>, IRequestHandler<PulseAudioStreamStoreQueryRequest, IEnumerable<IPulseAudioStream>>, INotificationHandler<PulseAudioStreamChangeNotification>
     {
         private readonly ILogger<PulseAudioStreamStoreInterface> _logger;
         private readonly IMediator _mediator;
@@ -91,10 +91,10 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             return Task.CompletedTask;
         }
 
-        public Task<IQueryable<IPulseAudioStream>> Handle(PulseAudioStreamStoreQueryRequest request, CancellationToken cancellationToken)
+        public Task<IEnumerable<IPulseAudioStream>> Handle(PulseAudioStreamStoreQueryRequest request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(_store.Streams.AsQueryable());
+            return Task.FromResult(_store.Streams.AsEnumerable());
         }
     }
 }

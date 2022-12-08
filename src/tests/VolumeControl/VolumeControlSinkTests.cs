@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Midicontrol.Midi;
 using Midicontrol.Midi.NativeSinks;
+using Midicontrol.Midi.NativeSinks.VolumeControl;
 using Moq;
 using Xunit;
 

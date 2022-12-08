@@ -1,5 +1,6 @@
 using System;
 using Midicontrol.Midi.NativeSinks;
+using Midicontrol.Midi.NativeSinks.VolumeControl;
 using Xunit;
 
 namespace Midicontrol.Tests;

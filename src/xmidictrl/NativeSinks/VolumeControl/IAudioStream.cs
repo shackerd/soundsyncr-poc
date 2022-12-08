@@ -1,4 +1,4 @@
-namespace Midicontrol.Midi.NativeSinks
+namespace Midicontrol.Midi.NativeSinks.VolumeControl
 {
     internal interface IAudioStream : IDisposable
     {

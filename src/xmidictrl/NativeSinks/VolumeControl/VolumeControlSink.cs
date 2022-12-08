@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Midicontrol.Midi.NativeSinks.VolumeControl;
 
 namespace Midicontrol.Midi.NativeSinks
 {
@@ -42,7 +43,7 @@ namespace Midicontrol.Midi.NativeSinks
                         await Task.WhenAll(streams.Select(s => s.ToggleMuteAsync(arg.Value != 0)));
                         break;
                     case ActionType.Solo:
-                        await _driver.ToggleSoloAsync(streams.Single(), arg.Value != 0);
+                        await _driver.ToggleSoloAsync(streams.Single(), action.StreamType, arg.Value != 0);
                         break;
                 }
             }

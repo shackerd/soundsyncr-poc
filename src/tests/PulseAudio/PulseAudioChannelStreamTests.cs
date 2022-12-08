@@ -18,10 +18,10 @@ namespace Midicontrol.Tests
 
             PulseAudioChannelStream stream =
                 new PulseAudioChannelStream(
-                    new PulseAudioDeviceStream(Midi.NativeSinks.StreamType.Playback, "", ObjectPath.Root, null!, null!),
+                    new PulseAudioDeviceStream(Midi.NativeSinks.VolumeControl.StreamType.Playback, "", ObjectPath.Root, null!, null!),
                     "",
                     ObjectPath.Root,
-                    Midi.NativeSinks.StreamType.Playback,
+                    Midi.NativeSinks.VolumeControl.StreamType.Playback,
 #pragma warning disable CS8625  // Wanted scenario
                     null,
 #pragma warning restore CS8625
@@ -55,10 +55,10 @@ namespace Midicontrol.Tests
 
             PulseAudioChannelStream stream =
                 new PulseAudioChannelStream(
-                    new PulseAudioDeviceStream(Midi.NativeSinks.StreamType.Playback, "", ObjectPath.Root, null!, null!),
+                    new PulseAudioDeviceStream(Midi.NativeSinks.VolumeControl.StreamType.Playback, "", ObjectPath.Root, null!, null!),
                     "",
                     ObjectPath.Root,
-                    Midi.NativeSinks.StreamType.Playback,
+                    Midi.NativeSinks.VolumeControl.StreamType.Playback,
                     mockProxy.Object,
                     mockLogger.Object
                 );
@@ -82,10 +82,10 @@ namespace Midicontrol.Tests
 
             PulseAudioChannelStream stream =
                 new PulseAudioChannelStream(
-                    new PulseAudioDeviceStream(Midi.NativeSinks.StreamType.Playback, "", ObjectPath.Root, null!, null!),
+                    new PulseAudioDeviceStream(Midi.NativeSinks.VolumeControl.StreamType.Playback, "", ObjectPath.Root, null!, null!),
                     "",
                     ObjectPath.Root,
-                    Midi.NativeSinks.StreamType.Playback,
+                    Midi.NativeSinks.VolumeControl.StreamType.Playback,
                     mockProxy.Object,
                     mockLogger.Object
                 );

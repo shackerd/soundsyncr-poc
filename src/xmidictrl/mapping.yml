@@ -35,6 +35,10 @@ devicesMap:
             params:
               - action: "mute://channel/playback"
                 destination: "chrome"
+          - controller: 34
+            params:
+              - action: "solo://channel/playback"
+                destination: "chrome"
           - controller: 0
             params:
               - action: "bind://device/playback"
