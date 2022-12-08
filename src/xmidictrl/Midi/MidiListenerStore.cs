@@ -27,7 +27,7 @@ namespace Midicontrol.Midi
 
         public IMidiDeviceListener GetListener(string deviceName)
         {
-            if (_listeners.TryGetValue(deviceName, out IMidiDeviceListener listener))
+            if (_listeners.TryGetValue(deviceName, out IMidiDeviceListener? listener))
             {
                 return listener;
             }

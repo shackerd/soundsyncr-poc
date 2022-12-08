@@ -7,6 +7,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 {
     internal interface IPulseAudioConnection
     {
+        bool IsInitialized { get; }
         Connection? Connection { get; }
         Task ConnectAsync();
     }
@@ -19,6 +20,8 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
         private Connection? _connection;
 
         public Connection? Connection => _connection;
+
+        public bool IsInitialized => _connection != null;
 
         public PulseAudioConnection(
             ILogger<IPulseAudioConnection> logger,

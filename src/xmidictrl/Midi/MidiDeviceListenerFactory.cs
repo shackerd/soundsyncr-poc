@@ -40,14 +40,15 @@ namespace Midicontrol.Midi
         public IMidiDeviceListener Create(PortMidi.MidiDeviceInfo device)
         {
 
-            var map = _bindingMap.DevicesMap.FirstOrDefault(d => d.DeviceName.Equals(device.Name));
-            var sinks = _sinks.Where(s => map.Sinks.Any(m => m.Name.Equals(s.Name)));
+            MidiDeviceMap? map = _bindingMap.DevicesMap.FirstOrDefault(d => d.DeviceName.Equals(device.Name));
+
+            IEnumerable<IMidiMessageSink> sinks = _sinks.Where(s => map.Sinks.Any(m => m.Name.Equals(s.Name)));
 
             IMidiMessageDispatcher dispatcher =
                 new MidiMessageDispatcher(_dispatcherLogger, sinks, map.Sinks, _synchronizationContext);
 
             IMidiDeviceListener listener = new MidiDeviceListener(device, _listenerLogger, dispatcher);
-            
+
             if(!_store.TryAdd(listener)){
                 throw new Exception("Cannot register listener");
             }
@@ -61,7 +62,7 @@ namespace Midicontrol.Midi
                 new DebugMidiMessageDispatcher(_dispatcherLogger);
 
             IMidiDeviceListener listener = new MidiDeviceListener(device, _listenerLogger, dispatcher);
-            
+
             if(!_store.TryAdd(listener)){
                 throw new Exception("Cannot register listener");
             }

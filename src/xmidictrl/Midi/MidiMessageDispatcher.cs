@@ -16,7 +16,7 @@ namespace Midicontrol.Midi
         private readonly IEnumerable<IMidiMessageSink> _sinks;
         private readonly IEnumerable<MidiSinkMap> _maps;
         private readonly SynchronizationContext _context;
-        public IEnumerable<IMidiMessageSink> Sinks => _sinks;        
+        public IEnumerable<IMidiMessageSink> Sinks => _sinks;
 
         public MidiMessageDispatcher(
             ILogger<IMidiMessageDispatcher> logger,
@@ -51,14 +51,14 @@ namespace Midicontrol.Midi
             return BroadcastAsyncInternal(message);
         }
 
-        private async Task BroadcastAsyncInternal(MidiMessage message)
+        private Task BroadcastAsyncInternal(MidiMessage message)
         {
             _context.Post(
                 async (_) =>
                 {
                     foreach (IMidiMessageSink sink in _sinks)
                     {
-                        IEnumerable<IMidiMessageSinkArgs> args = 
+                        IEnumerable<IMidiMessageSinkArgs> args =
                             BuildSinkArgs(message, sink);
 
                         if(!args.Any()){
@@ -72,20 +72,22 @@ namespace Midicontrol.Midi
                 },
                 null
             );
+
+            return Task.CompletedTask;
         }
 
         private IEnumerable<IMidiMessageSinkArgs> BuildSinkArgs(MidiMessage message, IMidiMessageSink sink)  // TryBuildSinkArgs -> bool + out param
         {
             MidiSinkMap map = _maps.FirstOrDefault(m => m.Name.Equals(sink.Name));
 
-            if(map == null) 
+            if(map == null)
             {
                 return Enumerable.Empty<IMidiMessageSinkArgs>();
             }
 
-            MidiBinding binding = 
+            MidiBinding binding =
                 map.Bindings.FirstOrDefault(b => b.Controller == (int)message.Controller);
-            
+
             if(binding == null)
             {
                 return Enumerable.Empty<IMidiMessageSinkArgs>();

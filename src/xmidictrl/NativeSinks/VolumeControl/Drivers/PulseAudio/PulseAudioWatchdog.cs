@@ -44,6 +44,10 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
         public Task InitializeAsync()
         {
+            if (!_connection!.IsInitialized)
+            {
+                throw new PulseAudioConnectionException("Connection is not initialized");
+            }
             _proxy = _connection!.Connection?.CreateProxy<ICoreProxy>(PulseAudioDBus.CoreSeviceName, PulseAudioDBus.CoreObjectPath);
 
             if (_proxy == null)
@@ -91,7 +95,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
                     _store.Managed.Add(stream.ObjectPath);
 
-                    IStreamProxy streamProxy = _connection!.Connection.CreateProxy<IStreamProxy>(PulseAudioDBus.StreamServiceName, stream.ObjectPath);
+                    IStreamProxy streamProxy = _connection!.Connection!.CreateProxy<IStreamProxy>(PulseAudioDBus.StreamServiceName, stream.ObjectPath);
 
                     await streamProxy.WatchVolumeUpdatedAsync((vol) => _logger.LogInformation($"PulseAudio: Volume Updated: {stream.Scope} {stream.Type} {stream.Identifier}"), e => _logger.LogError(e, e.Message));
                 },

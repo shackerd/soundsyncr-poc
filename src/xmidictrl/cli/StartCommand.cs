@@ -29,6 +29,12 @@ namespace Midicontrol.CLI
         {
             List<Task> listenerTasks = new();
 
+            if (_config.DevicesMap == null)
+            {
+                _logger.LogInformation($"No device map found, exiting...");
+                return Task.FromResult(0);
+            }
+
             foreach (var item in _config.DevicesMap)
             {
                 PortMidi.MidiDeviceInfo device =
