@@ -47,6 +47,10 @@ devicesMap:
             params:
               - action: "bind://device/record"
                 destination: "alsa_output.usb-Focusrite_Scarlett_Solo_USB-00.analog-stereo"
+          - controller: 7
+            params:
+              - action: "bind://channel/playback"
+                destination: "valheim.x86_64"
       # - name: "Debug_DISABLED"
       #   bindings:
       #     - controller: 2
