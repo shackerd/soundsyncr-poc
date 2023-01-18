@@ -21,6 +21,8 @@ devicesMap:
             params:
               - action: "bind://channel/playback?mode=TwoWay"
                 destination: "chrome"
+              - action: "bind://channel/playback?mode=TwoWay"
+                destination: "msedge"
           - controller: 1
             params:
               - action: "bind://channel/playback"
@@ -51,6 +53,10 @@ devicesMap:
             params:
               - action: "bind://channel/playback"
                 destination: "valheim.x86_64"
+              - action: "bind://channel/playback"
+                destination: "yuzu"
+              - action: "bind://channel/playback"
+                destination: "wine64-preloader"
       # - name: "Debug_DISABLED"
       #   bindings:
       #     - controller: 2

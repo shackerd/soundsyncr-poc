@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text;
+using System.Text.RegularExpressions;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Midicontrol.Midi.NativeSinks.PulseAudio.DBus;
@@ -84,7 +85,10 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
                 return null;
             }
 
-            PulseAudioChannelStream stream = new PulseAudioChannelStream(rootStream, kvs[_applicationProcessBinary], path, type, proxy, _channelLogger);
+            // process binary may have (deleted) suffix, so we extract value
+            string identifier = Regex.Match(kvs[_applicationProcessBinary], "^([^()\\s]+).*?").Value;
+
+            PulseAudioChannelStream stream = new PulseAudioChannelStream(rootStream, identifier, path, type, proxy, _channelLogger);
 
             return stream;
         }
