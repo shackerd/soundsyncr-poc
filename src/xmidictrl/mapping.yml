@@ -8,6 +8,7 @@ devicesMap:
     #   - id: 1
     #     valueRange: "0-127"
     #     writable: false
+
     sinks:
       - name: "Launcher"
         bindings:
@@ -19,9 +20,9 @@ devicesMap:
         bindings:
           - controller: 2
             params:
-              - action: "bind://channel/playback?mode=TwoWay"
+              - action: "bind://channel/playback?mode=TwoWay&policy=strict" # strict means on startup assign, read midi controller value & assign
                 destination: "chrome"
-              - action: "bind://channel/playback?mode=TwoWay"
+              - action: "bind://channel/playback?mode=TwoWay&policy=passive"
                 destination: "msedge"
           - controller: 1
             params:

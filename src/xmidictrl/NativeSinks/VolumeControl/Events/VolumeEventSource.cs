@@ -1,39 +1,27 @@
 namespace Midicontrol.Midi.NativeSinks.VolumeControl
 {
-    internal abstract class VolumeEvent
+    internal interface IVolumeEventSource
     {
-        DateTime On { get; }
+        DropOutStack<VolumeEvent> GetEvents(int hashcode);
+        void Publish(int hashcode, VolumeEvent @event);
+        void RemoveSource(int hashcode);
     }
 
-    internal class ManagedVolumeEvent : VolumeEvent
-    {
-
-    }
-
-    internal class UnManagedVolumeEvent : VolumeEvent
-    {
-
-    }
-
-    internal class VolumeCommand
-    {
-
-    }
-
-    internal class VolumeEventSource
+    internal class VolumeEventSource : IVolumeEventSource
     {
         private readonly Dictionary<int, DropOutStack<VolumeEvent>> _source =
             new Dictionary<int, DropOutStack<VolumeEvent>>();
 
         private readonly object _state = new Object();
-        private const uint _maxStackSize = 32;
+        private const uint _stackSize = 0x80; // 0x7F (127) << 1
 
         public VolumeEventSource() { }
 
         public DropOutStack<VolumeEvent> GetEvents(int hashcode)
         {
-            if(!_source.TryGetValue(hashcode, out var stack)){
-                DropOutStack<VolumeEvent> newStack = new(_maxStackSize);
+            if (!_source.TryGetValue(hashcode, out var stack))
+            {
+                DropOutStack<VolumeEvent> newStack = new(_stackSize);
                 _source.Add(hashcode, newStack);
                 stack = newStack;
             }
@@ -50,7 +38,7 @@ namespace Midicontrol.Midi.NativeSinks.VolumeControl
 
         public void RemoveSource(int hashcode)
         {
-            if(!_source.ContainsKey(hashcode)) return;
+            if (!_source.ContainsKey(hashcode)) return;
 
             _source.Remove(hashcode);
         }

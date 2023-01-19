@@ -86,7 +86,7 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
             }
 
             // process binary may have (deleted) suffix, so we extract value
-            string identifier = Regex.Match(kvs[_applicationProcessBinary], "^([^()\\s]+).*?").Value;
+            string identifier = Regex.Match(kvs[_applicationProcessBinary], "^[^()\\s]+.*?").Value;
 
             PulseAudioChannelStream stream = new PulseAudioChannelStream(rootStream, identifier, path, type, proxy, _channelLogger);
 
