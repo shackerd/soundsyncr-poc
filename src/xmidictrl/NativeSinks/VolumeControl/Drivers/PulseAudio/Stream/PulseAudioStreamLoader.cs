@@ -138,12 +138,10 @@ namespace Midicontrol.Midi.NativeSinks.PulseAudio
 
         private string ReadProperty(IDictionary<string, byte[]> properties, string propName)
         {
-            byte[] rawValue = properties[propName];
+            Span<byte> value = new Span<byte>(properties[propName]);
 
-            // skip last nullbyte
-            byte[] value = rawValue.Take(rawValue.Length - 1).ToArray();
-
-            return Encoding.Default.GetString(value);
+            // all values are string encoded with an additional nullbyte at the end
+            return Encoding.Default.GetString(value.Slice(0, value.Length - 1));
         }
     }
 }
