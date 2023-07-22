@@ -8,7 +8,6 @@ devicesMap:
     #   - id: 1
     #     valueRange: "0-127"
     #     writable: false
-
     sinks:
       - name: "Launcher"
         bindings:
@@ -20,10 +19,18 @@ devicesMap:
         bindings:
           - controller: 2
             params:
-              - action: "bind://channel/playback?mode=TwoWay&policy=strict" # strict means on startup assign, read midi controller value & assign
+              - action: "bind://channel/playback?mode=TwoWay"
                 destination: "chrome"
-              - action: "bind://channel/playback?mode=TwoWay&policy=passive"
+              - action: "bind://channel/playback?mode=TwoWay"
                 destination: "msedge"
+              - action: "bind://channel/playback?mode=TwoWay"
+                destination: "vivaldi-bin"
+              - action: "bind://channel/playback?mode=TwoWay"
+                destination: "brave"                
+          - controller: 3
+            params:
+              - action: "bind://channel/playback?mode=TwoWay"
+                destination: "spotify"                
           - controller: 1
             params:
               - action: "bind://channel/playback"
@@ -58,6 +65,14 @@ devicesMap:
                 destination: "yuzu"
               - action: "bind://channel/playback"
                 destination: "wine64-preloader"
+              - action: "bind://channel/playback"
+                destination: "Soulstone-Survivors.x86_64"
+              - action: "bind://channel/playback"
+                destination: "Last Epoch.x86_64"
+              - action: "bind://channel/playback"
+                destination: "Diablo IV.exe"                                
+              - action: "bind://channel/playback"
+                destination: "Fable Anniversary.exe"                                                
       # - name: "Debug_DISABLED"
       #   bindings:
       #     - controller: 2
