@@ -1,0 +1,87 @@
+modules:
+  - "PulseAudio"
+  - "Launcher"
+  - "Debug"
+devicesMap:
+  - deviceName: "nanoKONTROL2 nanoKONTROL2 _ CTR"
+    # controllers:
+    #   - id: 1
+    #     valueRange: "0-127"
+    #     writable: false
+    sinks:
+      - name: "Launcher"
+        bindings:
+          - controller: 18
+            params:
+              - action: "start"
+              - destination: "chrome"
+      - name: "VolumeControl"
+        bindings:
+          - controller: 2
+            params:
+              - action: "bind://channel/playback?mode=TwoWay"
+                destination: "chrome"
+              - action: "bind://channel/playback?mode=TwoWay"
+                destination: "msedge"
+              - action: "bind://channel/playback?mode=TwoWay"
+                destination: "vivaldi-bin"
+              - action: "bind://channel/playback?mode=TwoWay"
+                destination: "brave"                
+          - controller: 3
+            params:
+              - action: "bind://channel/playback?mode=TwoWay"
+                destination: "spotify"                
+          - controller: 1
+            params:
+              - action: "bind://channel/playback"
+                destination: "teams"
+              - action: "bind://channel/playback"
+                destination: "discord"
+          - controller: 49
+            params:
+              - action: "mute://channel/playback"
+                destination: "teams"
+          - controller: 50
+            params:
+              - action: "mute://channel/playback"
+                destination: "chrome"
+          - controller: 34
+            params:
+              - action: "solo://channel/playback"
+                destination: "chrome"
+          - controller: 0
+            params:
+              - action: "bind://device/playback"
+                destination: "alsa_output.usb-Focusrite_Scarlett_Solo_USB-00.analog-stereo"
+          - controller: 10
+            params:
+              - action: "bind://device/record"
+                destination: "alsa_output.usb-Focusrite_Scarlett_Solo_USB-00.analog-stereo"
+          - controller: 7
+            params:
+              - action: "bind://channel/playback"
+                destination: "valheim.x86_64"
+              - action: "bind://channel/playback"
+                destination: "yuzu"
+              - action: "bind://channel/playback"
+                destination: "wine64-preloader"
+              - action: "bind://channel/playback"
+                destination: "Soulstone-Survivors.x86_64"
+              - action: "bind://channel/playback"
+                destination: "Last Epoch.x86_64"
+              - action: "bind://channel/playback"
+                destination: "Diablo IV.exe"                                
+              - action: "bind://channel/playback"
+                destination: "Fable Anniversary.exe"                                                
+      # - name: "Debug_DISABLED"
+      #   bindings:
+      #     - controller: 2
+      #       params:
+      #         - action: "Debug.Action1"
+      #           destination: "chrome"
+      #         - action: "Debug.Action2"
+      #           destination: "other"
+      #     - controller: 1
+      #       params:
+      #         - action: "Debug.Action3"
+      #           destination: "teams"
