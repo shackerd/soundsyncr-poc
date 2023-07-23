@@ -6,6 +6,8 @@ I plan to write a clean version of this project in rust.
 
 Actually their is no Windows support yet, this tool only works with pulse audio.
 
+Device used: Korg NanoKontrol2
+
 
 ## pulse audio (dbus)
 
