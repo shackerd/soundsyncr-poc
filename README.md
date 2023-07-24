@@ -4,7 +4,7 @@ This is a proof of concept, i used this project for understanding how pulse audi
 
 I plan to write a clean version of this project in rust.
 
-Actually their is no Windows support yet, this tool only works with pulse audio.
+Actually their is no Windows support yet, this tool only works with pulse audio, but will run under Windows later.
 
 Device used: Korg NanoKontrol2
 
